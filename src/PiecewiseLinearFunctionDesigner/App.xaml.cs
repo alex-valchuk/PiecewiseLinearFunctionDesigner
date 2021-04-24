@@ -24,6 +24,8 @@ namespace PiecewiseLinearFunctionDesigner
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IMessageService, MessageService>();
+            containerRegistry.RegisterSingleton<IFileSystemService, FileSystemService>();
             containerRegistry.RegisterSingleton<IProjectService, ProjectService>();
             containerRegistry.RegisterSingleton<ITextLocalization, RussianTextLocalization>();
             containerRegistry.RegisterSingleton<IApplicationCommands, ApplicationCommands>();

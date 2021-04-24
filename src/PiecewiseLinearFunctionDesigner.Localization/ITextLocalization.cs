@@ -7,5 +7,6 @@
         string Function { get; }
         string Add { get; }
         string FunctionWithNameAlreadyAdded { get; }
+        string InvalidFileType { get; }
     }
 }

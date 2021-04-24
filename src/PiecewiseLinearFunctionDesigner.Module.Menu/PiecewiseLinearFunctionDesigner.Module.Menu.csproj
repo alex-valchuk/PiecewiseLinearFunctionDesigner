@@ -9,5 +9,7 @@
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\PiecewiseLinearFunctionDesigner.Core\PiecewiseLinearFunctionDesigner.Core.csproj" />
+      <ProjectReference Include="..\PiecewiseLinearFunctionDesigner.DomainModel\PiecewiseLinearFunctionDesigner.DomainModel.csproj" />
+      <ProjectReference Include="..\PiecewiseLinearFunctionDesigner.Localization\PiecewiseLinearFunctionDesigner.Localization.csproj" />
     </ItemGroup>
 </Project>
