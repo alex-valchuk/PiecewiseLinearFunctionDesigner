@@ -1,0 +1,19 @@
+﻿<Window x:Class="PiecewiseLinearFunctionDesigner.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:prism="http://prismlibrary.com/"
+        prism:ViewModelLocator.AutoWireViewModel="True"
+        Title="{Binding TextLocalization.AppName}">
+    <StackPanel Orientation="Vertical">
+        <ContentControl prism:RegionManager.RegionName="MenuRegion" DockPanel.Dock="Top" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <ContentControl prism:RegionManager.RegionName="DemonstrationRegion" Grid.Column="0"/>
+            <ContentControl prism:RegionManager.RegionName="DeclarationRegion" Grid.Column="1" />
+        </Grid>
+    </StackPanel>
+</Window>

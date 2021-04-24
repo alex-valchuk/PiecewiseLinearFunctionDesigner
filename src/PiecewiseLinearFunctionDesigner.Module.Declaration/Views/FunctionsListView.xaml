@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="PiecewiseLinearFunctionDesigner.Module.Declaration.Views.FunctionListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             prism:ViewModelLocator.AutoWireViewModel="True" Padding="25">
+    <ScrollViewer CanContentScroll="True" Height="150">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="{Binding TextLocalization.Functions}"></TextBlock>
+            <Grid>
+                <ListView ItemsSource="{DynamicResource ResourceKey=Functions}" >
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Enabled}"></GridViewColumn>
+                            <GridViewColumn DisplayMemberBinding="{Binding Path=Name}" Header="{Binding TextLocalization.Function}"></GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </Grid>
+            <Button Command="{Binding AddFunctionCommand}" Width="200" Content="{Binding TextLocalization.Add}" HorizontalAlignment="Left"></Button>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

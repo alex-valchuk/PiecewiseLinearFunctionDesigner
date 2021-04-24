@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="PiecewiseLinearFunctionDesigner.Module.Menu.Views.MenuView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"             
+             prism:ViewModelLocator.AutoWireViewModel="True" Padding="25">
+    <StackPanel>
+        <Menu VerticalAlignment="Top">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Новый проект" Command="{Binding NewCommand}"/>
+                <MenuItem Header="Открыть проект" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Сохранить" Command="{Binding SaveCommand}" Visibility="{Binding SaveVisibility}" IsEnabled="{Binding IsSaveEnabled}" />
+                <MenuItem Header="Сохранить и выйти" Command="{Binding SaveAndExitCommand}" Visibility="{Binding SaveVisibility}" IsEnabled="{Binding IsSaveEnabled}"/>
+                <MenuItem Header="Выйти" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+        </Menu>
+    </StackPanel>
+</UserControl>
