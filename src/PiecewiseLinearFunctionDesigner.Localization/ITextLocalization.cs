@@ -10,5 +10,6 @@
         string InvalidFileType { get; }
         string UnsavedChanges { get; }
         string AreYouSureYouWantToCloseActiveProject { get; }
+        string ProjectSuccessfullySaved { get; }
     }
 }

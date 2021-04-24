@@ -7,8 +7,9 @@
         public string Function => "Функция";
         public string Add => "Добавить";
         public string FunctionWithNameAlreadyAdded => "Функция с именем '{0}' уже существует";
-        public string InvalidFileType => "Поддерживаются только файлы с расширением '{0}'";
+        public string InvalidFileType => "Неверный формат файла";
         public string UnsavedChanges => "Есть несохраненные изменения.";
         public string AreYouSureYouWantToCloseActiveProject => "Уверены, что хотите закрыть текущий проект?";
+        public string ProjectSuccessfullySaved => "Проект успешно сохранен";
     }
 }

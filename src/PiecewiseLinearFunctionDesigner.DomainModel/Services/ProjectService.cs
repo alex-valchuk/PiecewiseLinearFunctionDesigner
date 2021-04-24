@@ -10,7 +10,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
 {
     public interface IProjectService
     {
-        void SetActiveProjectFilePath(string filePath);
+        Task SetActiveProjectAsync(string filePath);
         
         void SetActiveProject(Project project);
 
@@ -18,33 +18,34 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
         
         Task<Project> LoadProjectAsync();
         
-        Task SaveProjectAsync(Project project, string filePath);
+        Task SaveActiveProjectAsync(string filePath);
     }
 
     public class ProjectService : IProjectService
     {
-        private const string ProjectExtension = ".plf";
-        
         private string _activeProjectFilePath;
         private Project _activeProject;
 
-        public void SetActiveProjectFilePath(string filePath)
+        public async Task SetActiveProjectAsync(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new EmptyStringArgumentException(nameof(filePath));
 
-            if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
-                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);
+            /*if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);*/
             
-            if (!File.Exists(_activeProjectFilePath))
-                throw new InvalidOperationException("The active project file path is invalid.");
-            
+            if (!File.Exists(filePath))
+                throw new InvalidOperationException("The path is invalid.");
+
             _activeProjectFilePath = filePath;
+            _activeProject = null;
+
+            _activeProject = await LoadProjectAsync();
         }
 
         public void SetActiveProject(Project project)
         {
-            _activeProject = project ?? throw new ArgumentNullException(nameof(project));
+            _activeProject = project;
         }
 
         public bool HasActiveProject()
@@ -58,29 +59,36 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
                 return _activeProject;
             
             if (string.IsNullOrWhiteSpace(_activeProjectFilePath))
-                throw new InvalidOperationException($"You must first specify the active project file path by calling {nameof(SetActiveProjectFilePath)} method.");
+                throw new InvalidOperationException($"You must first specify the active project file path by calling {nameof(SetActiveProjectAsync)} method.");
             
             if (!File.Exists(_activeProjectFilePath))
                 throw new InvalidOperationException("The active project file path is invalid.");
 
-            var projectContent = await File.ReadAllTextAsync(_activeProjectFilePath);
-            _activeProject = JsonConvert.DeserializeObject<Project>(projectContent);
+            try
+            {
+                var projectContent = await File.ReadAllTextAsync(_activeProjectFilePath);
+                _activeProject = JsonConvert.DeserializeObject<Project>(projectContent);
 
-            return _activeProject;
+                return _activeProject;
+            }
+            catch (JsonReaderException ex)
+            {
+                throw new InvalidFileTypeException(ex.Message);
+            }
         }
 
-        public Task SaveProjectAsync(Project project, string filePath)
+        public Task SaveActiveProjectAsync(string filePath)
         {
-            if (project == null)
-                throw new ArgumentNullException(nameof(project));
+            if (_activeProject == null)
+                throw new InvalidOperationException("The active project is not specified.");
             
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new EmptyStringArgumentException(nameof(filePath));
 
-            if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
-                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);
+            /*if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);*/
 
-            var projectContent = JsonConvert.SerializeObject(project);
+            var projectContent = JsonConvert.SerializeObject(_activeProject);
             return File.WriteAllTextAsync(filePath, projectContent);
         }
     }

@@ -9,7 +9,7 @@
                 <MenuItem Header="Новый проект" Command="{Binding NewCommand}"/>
                 <MenuItem Header="Открыть проект" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="Сохранить" Command="{Binding SaveCommand}" Visibility="{Binding SaveVisibility}" IsEnabled="{Binding IsSaveEnabled}" />
-                <MenuItem Header="Сохранить и выйти" Command="{Binding SaveAndExitCommand}" Visibility="{Binding SaveVisibility}" IsEnabled="{Binding IsSaveEnabled}"/>
+                <MenuItem Header="Сохранить и закрыть" Command="{Binding SaveAndCloseCommand}" Visibility="{Binding SaveVisibility}" IsEnabled="{Binding IsSaveEnabled}"/>
                 <MenuItem Header="Выйти" Command="{Binding ExitCommand}"/>
             </MenuItem>
         </Menu>

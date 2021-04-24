@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Const;
@@ -39,7 +40,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             {
                 SetProperty(ref _isSaveEnabled, value);
                 SaveCommand.RaiseCanExecuteChanged();
-                SaveAndExitCommand.RaiseCanExecuteChanged();
+                SaveAndCloseCommand.RaiseCanExecuteChanged();
             }
         }
         
@@ -49,7 +50,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
         
         public DelegateCommand SaveCommand { get; private set; }
         
-        public DelegateCommand SaveAndExitCommand { get; private set; }
+        public DelegateCommand SaveAndCloseCommand { get; private set; }
         
         public DelegateCommand ExitCommand { get; private set; }
 
@@ -71,7 +72,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             NewCommand = new DelegateCommand(ExecuteNewCommand);
             OpenCommand = new DelegateCommand(ExecuteOpenCommand);
             SaveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand);
-            SaveAndExitCommand = new DelegateCommand(ExecuteSaveAndExitCommand, CanExecuteSaveCommand);
+            SaveAndCloseCommand = new DelegateCommand(ExecuteSaveAndCloseCommand, CanExecuteSaveCommand);
             ExitCommand = new DelegateCommand(ExecuteExitCommand);
         }
 
@@ -95,27 +96,47 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             IsSaveEnabled = true;
         }
 
-        private void ExecuteOpenCommand()
+        private async void ExecuteOpenCommand()
         {
             if (_fileSystemService.OpenFile(out var selectedFile))
             {
                 try
                 {
-                    _projectService.SetActiveProjectFilePath(selectedFile);
+                    await _projectService.SetActiveProjectAsync(selectedFile);
                     _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
 
                     SaveVisibility = Visibility.Visible;
                 }
-                catch (InvalidFileTypeException ex)
+                catch (InvalidFileTypeException)
                 {
-                    _messageService.ShowMessage(string.Format(_textLocalization.InvalidFileType, ex.SupportedFileTypes));
+                    _messageService.ShowMessage(_textLocalization.InvalidFileType);
                 }
             }
         }
 
-        private void ExecuteSaveCommand()
+        private async void ExecuteSaveCommand()
         {
-            IsSaveEnabled = false;
+            await SaveProjectAsync();
+        }
+
+        private async Task<bool> SaveProjectAsync()
+        {
+            if (_fileSystemService.OpenFile(out var filePath))
+            {
+                try
+                {
+                    await _projectService.SaveActiveProjectAsync(filePath);
+                    _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
+                    IsSaveEnabled = false;
+                    return true;
+                }
+                catch (InvalidFileTypeException)
+                {
+                    _messageService.ShowMessage(string.Format(_textLocalization.InvalidFileType));
+                }
+            }
+
+            return false;
         }
 
         private bool CanExecuteSaveCommand()
@@ -123,9 +144,14 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             return SaveVisibility == Visibility.Visible && IsSaveEnabled;
         }
 
-        private void ExecuteSaveAndExitCommand()
+        private async void ExecuteSaveAndCloseCommand()
         {
-            IsSaveEnabled = false;
+            if (await SaveProjectAsync())
+            {
+                _projectService.SetActiveProject(null);
+                _eventAggregator.GetEvent<ProjectClosedEvent>().Publish();
+                SaveVisibility = Visibility.Collapsed;
+            }
         }
 
         private void ExecuteExitCommand()

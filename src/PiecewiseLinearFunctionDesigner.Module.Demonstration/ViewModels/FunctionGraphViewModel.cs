@@ -38,6 +38,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
             
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
+            _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
         private async void ProjectSpecifiedEventReceived()
@@ -45,6 +46,12 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             var project = await _projectService.LoadProjectAsync();
             Functions = project.Functions;
             ControlVisibility = Visibility.Visible;
+        }
+    
+        private void ProjectClosedEventReceived()
+        {
+            Functions = null;
+            ControlVisibility = Visibility.Collapsed;
         }
     }
 }
