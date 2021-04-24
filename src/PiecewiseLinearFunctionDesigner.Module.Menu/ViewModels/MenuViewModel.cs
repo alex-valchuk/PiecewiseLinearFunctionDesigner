@@ -4,6 +4,7 @@ using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Const;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
+using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using PiecewiseLinearFunctionDesigner.Localization;
 using Prism.Commands;
@@ -81,7 +82,17 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
 
         private void ExecuteNewCommand()
         {
+            if (IsSaveEnabled)
+            {
+                if (!_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.AreYouSureYouWantToCloseActiveProject))
+                    return;
+            }
+
+            _projectService.SetActiveProject(new Project());
+            _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
+                
             SaveVisibility = Visibility.Visible;
+            IsSaveEnabled = true;
         }
 
         private void ExecuteOpenCommand()
@@ -121,7 +132,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
         {
             if (IsSaveEnabled)
             {
-                if (_messageService.ActionConfirmed("Есть несохраненные изменения.", "Уверены, что хотите закрыть?"))
+                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.AreYouSureYouWantToCloseActiveProject))
                 {
                     SaveVisibility = Visibility.Collapsed;
                 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -17,6 +18,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         
         public IReadOnlyList<Function> Functions { get; private set; }
 
+        private Visibility _controlVisibility = Visibility.Collapsed;
+        public Visibility ControlVisibility
+        {
+            get { return _controlVisibility; }
+            set
+            {
+                SetProperty(ref _controlVisibility, value);
+            }
+        }
+
         public FunctionGraphViewModel(
             IEventAggregator eventAggregator,
             ITextLocalization textLocalization,
@@ -33,6 +44,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         {
             var project = await _projectService.LoadProjectAsync();
             Functions = project.Functions;
+            ControlVisibility = Visibility.Visible;
         }
     }
 }

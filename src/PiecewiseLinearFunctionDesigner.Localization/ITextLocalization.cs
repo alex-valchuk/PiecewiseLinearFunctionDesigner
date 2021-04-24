@@ -8,5 +8,7 @@
         string Add { get; }
         string FunctionWithNameAlreadyAdded { get; }
         string InvalidFileType { get; }
+        string UnsavedChanges { get; }
+        string AreYouSureYouWantToCloseActiveProject { get; }
     }
 }

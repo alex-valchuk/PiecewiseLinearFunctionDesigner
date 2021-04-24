@@ -3,6 +3,7 @@ using Prism.Events;
 using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Const;
 using PiecewiseLinearFunctionDesigner.Core.Events;
@@ -19,6 +20,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private readonly IProjectService _projectService;
         private readonly IMessageService _messageService;
 
+        private Visibility _controlVisibility = Visibility.Collapsed;
+        public Visibility ControlVisibility
+        {
+            get { return _controlVisibility; }
+            set
+            {
+                SetProperty(ref _controlVisibility, value);
+            }
+        }
+
         public ITextLocalization TextLocalization { get; }
         
         private ObservableCollection<Function> _functions = new ObservableCollection<Function>();
@@ -27,7 +38,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             get { return _functions; }
             set { SetProperty(ref _functions, value); }
         }
-
+        
         public DelegateCommand AddFunctionCommand { get; }
 
         public FunctionListViewModel(
@@ -74,6 +85,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         {
             var project = await _projectService.LoadProjectAsync();
             Functions = new ObservableCollection<Function>(project.Functions);
+            ControlVisibility = Visibility.Visible;
         }
     }
 }

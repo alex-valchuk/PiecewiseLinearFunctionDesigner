@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True" Padding="25">
-    <ScrollViewer CanContentScroll="True" Height="150">
+    <ScrollViewer CanContentScroll="True" Height="150" Visibility="{Binding ControlVisibility}">
         <StackPanel Orientation="Vertical">
             <TextBlock Text="{Binding TextLocalization.Functions}"></TextBlock>
             <Grid>

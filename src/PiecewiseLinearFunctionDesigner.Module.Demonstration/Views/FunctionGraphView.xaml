@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:prism="http://prismlibrary.com/"             
              prism:ViewModelLocator.AutoWireViewModel="True" Padding="25">
-    <StackPanel>
+    <StackPanel Visibility="{Binding ControlVisibility}">
         <TextBlock Text="Здесь будет график функций"/>
     </StackPanel>
 </UserControl>

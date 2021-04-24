@@ -12,6 +12,10 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
     {
         void SetActiveProjectFilePath(string filePath);
         
+        void SetActiveProject(Project project);
+
+        bool HasActiveProject();
+        
         Task<Project> LoadProjectAsync();
         
         Task SaveProjectAsync(Project project, string filePath);
@@ -22,7 +26,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
         private const string ProjectExtension = ".plf";
         
         private string _activeProjectFilePath;
-        private Project _currentProject;
+        private Project _activeProject;
 
         public void SetActiveProjectFilePath(string filePath)
         {
@@ -38,10 +42,20 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             _activeProjectFilePath = filePath;
         }
 
+        public void SetActiveProject(Project project)
+        {
+            _activeProject = project ?? throw new ArgumentNullException(nameof(project));
+        }
+
+        public bool HasActiveProject()
+        {
+            return _activeProject != null;
+        }
+
         public async Task<Project> LoadProjectAsync()
         {
-            if (_currentProject != null)
-                return _currentProject;
+            if (HasActiveProject())
+                return _activeProject;
             
             if (string.IsNullOrWhiteSpace(_activeProjectFilePath))
                 throw new InvalidOperationException($"You must first specify the active project file path by calling {nameof(SetActiveProjectFilePath)} method.");
@@ -50,9 +64,9 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
                 throw new InvalidOperationException("The active project file path is invalid.");
 
             var projectContent = await File.ReadAllTextAsync(_activeProjectFilePath);
-            _currentProject = JsonConvert.DeserializeObject<Project>(projectContent);
+            _activeProject = JsonConvert.DeserializeObject<Project>(projectContent);
 
-            return _currentProject;
+            return _activeProject;
         }
 
         public Task SaveProjectAsync(Project project, string filePath)
