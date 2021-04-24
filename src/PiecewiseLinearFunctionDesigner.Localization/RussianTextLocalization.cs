@@ -11,5 +11,8 @@
         public string UnsavedChanges => "Есть несохраненные изменения.";
         public string AreYouSureYouWantToCloseActiveProject => "Уверены, что хотите закрыть текущий проект?";
         public string ProjectSuccessfullySaved => "Проект успешно сохранен";
+        public string Temperature => "Температура";
+        public string AbsoluteMark => "Абсолютная отметка";
+        public string Graph => "График";
     }
 }

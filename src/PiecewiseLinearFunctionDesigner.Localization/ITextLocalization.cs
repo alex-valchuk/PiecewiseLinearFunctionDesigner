@@ -11,5 +11,8 @@
         string UnsavedChanges { get; }
         string AreYouSureYouWantToCloseActiveProject { get; }
         string ProjectSuccessfullySaved { get; }
+        string Temperature { get; }
+        string AbsoluteMark { get; }
+        string Graph { get; }
     }
 }
