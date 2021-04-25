@@ -4,7 +4,9 @@
     {
         public string AppName => "Дизайнер кривых линий";
         public string Functions => "Список функций проекта";
-        public string Function => "Имя функции";
+        public string Function => "Функция";
+        public string FunctionName => "Имя функции";
+        public string FunctionParameters => "Параметры функции";
         public string Add => "Добавить";
         public string FunctionWithNameAlreadyAdded => "Функция с именем '{0}' уже существует";
         public string InvalidFileType => "Неверный формат файла";

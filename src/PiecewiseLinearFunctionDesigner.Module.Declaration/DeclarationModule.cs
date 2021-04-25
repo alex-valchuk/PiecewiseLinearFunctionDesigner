@@ -11,7 +11,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration
         {
             var regionManager = containerProvider.Resolve<IRegionManager>();
             regionManager.RegisterViewWithRegion("DeclarationRegion", typeof(FunctionListView));
-            regionManager.RegisterViewWithRegion("DeclarationSelectedFunctionRegion", typeof(FunctionView));
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

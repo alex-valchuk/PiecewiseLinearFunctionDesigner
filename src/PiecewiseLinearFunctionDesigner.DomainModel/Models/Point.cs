@@ -1,9 +1,23 @@
-﻿namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
+﻿using Prism.Mvvm;
+
+namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
-    public class Point
+    public class Point : BindableBase
     {
-        public double X { get; set; }
-        
-        public double Y { get; set; }
+        private double _x;
+
+        public double X
+        {
+            get => _x;
+            set => SetProperty(ref _x, value);
+        }
+
+        private double _y;
+
+        public double Y
+        {
+            get => _y;
+            set => SetProperty(ref _y, value);
+        }
     }
 }

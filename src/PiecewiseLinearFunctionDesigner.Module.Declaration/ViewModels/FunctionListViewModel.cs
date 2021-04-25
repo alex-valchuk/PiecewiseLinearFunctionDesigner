@@ -75,7 +75,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
                 Name = GetNewFunctionName(project)
             });
 
-            Functions.Add(project.Functions.Last());
             SelectedFunction = project.Functions.Last().Name;
             _eventAggregator.GetEvent<MessageSentEvent>().Publish(MessageMarkers.AnyChangeMade);
         }
@@ -98,7 +97,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private async void ProjectSpecifiedEventReceived()
         {
             var project = await _projectService.LoadProjectAsync();
-            Functions = new ObservableCollection<Function>(project.Functions);
+            Functions = project.Functions;
             SelectedFunction = project.Functions.FirstOrDefault()?.Name;
             ControlVisibility = Visibility.Visible;
 

@@ -29,10 +29,14 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         public Visibility ControlVisibility
         {
             get { return _controlVisibility; }
-            set
-            {
-                SetProperty(ref _controlVisibility, value);
-            }
+            set => SetProperty(ref _controlVisibility, value);
+        }
+
+        private Project _activeProject;
+        public Project ActiveProject
+        {
+            get => _activeProject;
+            set => SetProperty(ref _activeProject, value);
         }
 
         public ITextLocalization TextLocalization { get; }
@@ -49,12 +53,13 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
+            _eventAggregator.GetEvent<PointsChangedEvent>().Subscribe(PointsChangedEventReceived);
         }
 
         private async void ProjectSpecifiedEventReceived()
         {
-            var project = await _projectService.LoadProjectAsync();
-            Lines = BuildLinesGraph(project.Functions.FirstOrDefault());
+            ActiveProject = await _projectService.LoadProjectAsync();
+            Lines = BuildLinesGraph(ActiveProject.Functions.FirstOrDefault());
             ControlVisibility = Visibility.Visible;
         }
 
@@ -76,16 +81,25 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             return new List<LineGraph> {lineGraph};
         }
 
-        private async void FunctionSpecifiedEventReceived(string functionName)
+        private string _functionName;
+        private void FunctionSpecifiedEventReceived(string functionName)
         {
-            var project = await _projectService.LoadProjectAsync();
-            Lines = BuildLinesGraph(project.GetFunctionByName(functionName));
+            _functionName = functionName;
+            Lines = BuildLinesGraph(ActiveProject?.GetFunctionByName(functionName));
         }
 
         private void ProjectClosedEventReceived()
         {
             Lines = null;
             ControlVisibility = Visibility.Collapsed;
+        }
+
+        private void PointsChangedEventReceived()
+        {
+            if (string.IsNullOrWhiteSpace(_functionName))
+                return;
+            
+            Lines = BuildLinesGraph(ActiveProject.GetFunctionByName(_functionName));
         }
     }
 }

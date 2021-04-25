@@ -1,11 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
+using Prism.Mvvm;
 
 namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
-    public class Function
+    public class Function : BindableBase
     {
-        public string Name { get; set; }
+        private string _name;
 
-        public IReadOnlyList<Point> Points { get; set; } = new List<Point>();
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
+
+        private ObservableCollection<Point> _points = new ObservableCollection<Point>();
+        public ObservableCollection<Point> Points
+        {
+            get => _points;
+            set => SetProperty(ref _points, value);
+        }
     }
 }

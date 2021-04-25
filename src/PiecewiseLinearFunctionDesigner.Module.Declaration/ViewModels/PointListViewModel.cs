@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows;
+using System.Collections.ObjectModel;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -9,31 +9,21 @@ using Prism.Mvvm;
 
 namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 {
-    public class FunctionViewModel : BindableBase
-    {
+    public class PointListViewModel : BindableBase
+    { 
         private readonly IEventAggregator _eventAggregator;
         private readonly IProjectService _projectService;
-
+        
         public ITextLocalization TextLocalization { get; }
 
-        private Function _selectedFunction;
-        public Function SelectedFunction
+        private ObservableCollection<Point> _points = new ObservableCollection<Point>();
+        public ObservableCollection<Point> Points
         {
-            get => _selectedFunction;
-            set => SetProperty(ref _selectedFunction, value);
+            get => _points;
+            set => SetProperty(ref _points, value);
         }
 
-        private Visibility _controlVisibility = Visibility.Collapsed;
-        public Visibility ControlVisibility
-        {
-            get { return _controlVisibility; }
-            set
-            {
-                SetProperty(ref _controlVisibility, value);
-            }
-        }
-
-        public FunctionViewModel(
+        public PointListViewModel(
             IEventAggregator eventAggregator,
             ITextLocalization textLocalization,
             IProjectService projectService)
@@ -41,15 +31,15 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
-
+            
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
         }
 
         private async void FunctionSpecifiedEventReceived(string selectedFunction)
         {
             var project = await _projectService.LoadProjectAsync();
-            SelectedFunction = project.GetFunctionByName(selectedFunction);
-            ControlVisibility = Visibility.Visible;
+            var function = project.GetFunctionByName(selectedFunction);
+            Points = function?.Points;
         }
     }
 }
