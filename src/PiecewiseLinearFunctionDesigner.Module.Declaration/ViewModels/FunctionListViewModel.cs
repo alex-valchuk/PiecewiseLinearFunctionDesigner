@@ -4,7 +4,6 @@ using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Const;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
@@ -18,7 +17,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IProjectService _projectService;
-        private readonly IMessageService _messageService;
 
         private Visibility _controlVisibility = Visibility.Collapsed;
         public Visibility ControlVisibility
@@ -38,55 +36,76 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             get { return _functions; }
             set { SetProperty(ref _functions, value); }
         }
-        
+
+        private string _selectedFunction;
+        public string SelectedFunction
+        {
+            get => _selectedFunction;
+            set
+            {
+                SetProperty(ref _selectedFunction, value);
+                SelectFunctionCommand.Execute();
+            }
+        }
+
         public DelegateCommand AddFunctionCommand { get; }
+        public DelegateCommand SelectFunctionCommand { get; }
 
         public FunctionListViewModel(
             IEventAggregator eventAggregator,
             ITextLocalization textLocalization,
-            IProjectService projectService,
-            IMessageService messageService)
+            IProjectService projectService)
         {
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
-            _messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
 
             AddFunctionCommand = new DelegateCommand(HandleAddFunctionCommand);
+            SelectFunctionCommand = new DelegateCommand(HandleSelectFunctionCommand);
 
-            _eventAggregator.GetEvent<MessageSentEvent>().Subscribe(AddFunctionMessageReceived, ThreadOption.PublisherThread, false, filter => filter.StartsWith(MessageMarkers.NewFunction));
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
-        private void HandleAddFunctionCommand()
+        private async void HandleAddFunctionCommand()
         {
-            throw new NotImplementedException();
+            var project = await _projectService.LoadProjectAsync();
+            project.Functions.Add(new Function
+            {
+                Name = GetNewFunctionName(project)
+            });
+
+            Functions.Add(project.Functions.Last());
+            SelectedFunction = project.Functions.Last().Name;
+            _eventAggregator.GetEvent<MessageSentEvent>().Publish(MessageMarkers.AnyChangeMade);
         }
 
-        private void AddFunctionMessageReceived(string newFunctionMessage)
+        private string GetNewFunctionName(Project project, int attempt = 0)
         {
-            var functionName = newFunctionMessage.Substring(MessageMarkers.NewFunction.Length);
-            if (Functions.All(f => !f.Name.Equals(functionName)))
-            {
-                Functions.Add(new Function
-                {
-                    Name = functionName,
-                    Enabled = true
-                });
-                _eventAggregator.GetEvent<MessageSentEvent>().Publish(MessageMarkers.AnyChangeMade);
-            }
-            else
-            {
-                _messageService.ShowMessage(string.Format(TextLocalization.FunctionWithNameAlreadyAdded, functionName));
-            }
+            int functionNumber = project.Functions.Count + 1 + attempt;
+            var functionName = $"{TextLocalization.Function} {functionNumber}";
+            if (project.GetFunctionByName(functionName) == null)
+                return functionName;
+
+            return GetNewFunctionName(project, ++attempt);
+        }
+
+        private void HandleSelectFunctionCommand()
+        {
+            _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
         }
 
         private async void ProjectSpecifiedEventReceived()
         {
             var project = await _projectService.LoadProjectAsync();
             Functions = new ObservableCollection<Function>(project.Functions);
+            SelectedFunction = project.Functions.FirstOrDefault()?.Name;
             ControlVisibility = Visibility.Visible;
+
+            if (!string.IsNullOrWhiteSpace(SelectedFunction))
+            {
+                _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
+            }
         }
     
         private void ProjectClosedEventReceived()

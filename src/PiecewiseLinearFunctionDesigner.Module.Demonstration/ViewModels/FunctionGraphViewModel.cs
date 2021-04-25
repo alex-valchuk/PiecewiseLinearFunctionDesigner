@@ -47,38 +47,39 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
+            _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
         private async void ProjectSpecifiedEventReceived()
         {
             var project = await _projectService.LoadProjectAsync();
-            Lines = BuildLinesGraph(project);
+            Lines = BuildLinesGraph(project.Functions.FirstOrDefault());
             ControlVisibility = Visibility.Visible;
         }
 
-        private static List<LineGraph> BuildLinesGraph(Project project)
+        private static List<LineGraph> BuildLinesGraph(Function function)
         {
-            var lines = new List<LineGraph>();
-
-            byte i = 1;
-            foreach (var function in project.Functions.Where(f => f.Enabled))
+            if (function == null)
+                return new List<LineGraph>();
+            
+            var lineGraph = new LineGraph
             {
-                var lineGraph = new LineGraph
-                {
-                    Stroke = new SolidColorBrush(Color.FromRgb((byte) (255 / i), (byte) (25 / i), 25)),
-                    Description = function.Name,
-                    StrokeThickness = 2,
-                    Width = 450,
-                    Height = 450,
-                    Points = new PointCollection(function.Points.Select(p => new System.Windows.Point(p.X, p.Y)))
-                };
+                Stroke = new SolidColorBrush(Color.FromRgb(255, 25, 25)),
+                Description = function.Name,
+                StrokeThickness = 2,
+                Width = 450,
+                Height = 450,
+                Points = new PointCollection(function.Points.Select(p => new System.Windows.Point(p.X, p.Y)))
+            };
 
-                lines.Add(lineGraph);
-                i++;
-            }
+            return new List<LineGraph> {lineGraph};
+        }
 
-            return lines;
+        private async void FunctionSpecifiedEventReceived(string functionName)
+        {
+            var project = await _projectService.LoadProjectAsync();
+            Lines = BuildLinesGraph(project.GetFunctionByName(functionName));
         }
 
         private void ProjectClosedEventReceived()

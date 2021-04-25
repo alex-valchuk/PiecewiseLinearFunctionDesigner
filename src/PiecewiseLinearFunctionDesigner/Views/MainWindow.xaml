@@ -4,16 +4,21 @@
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
         Title="{Binding TextLocalization.AppName}">
-    <StackPanel Orientation="Vertical">
+    <StackPanel Orientation="Vertical" Margin="0">
         <ContentControl prism:RegionManager.RegionName="MenuRegion" DockPanel.Dock="Top" />
         <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
 
-            <ContentControl prism:RegionManager.RegionName="DemonstrationRegion" Grid.Column="0"/>
-            <ContentControl prism:RegionManager.RegionName="DeclarationRegion" Grid.Column="1" />
+            <ContentControl prism:RegionManager.RegionName="DemonstrationRegion" Grid.Column="0" Grid.RowSpan="2"/>
+            <ContentControl prism:RegionManager.RegionName="DeclarationRegion" Grid.Column="1" Grid.Row="0" />
+            <ContentControl prism:RegionManager.RegionName="DeclarationSelectedFunctionRegion" Grid.Column="1" Grid.Row="1" />
         </Grid>
     </StackPanel>
 </Window>
