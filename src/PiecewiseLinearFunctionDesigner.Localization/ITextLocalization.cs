@@ -7,7 +7,7 @@
         string Function { get; }
         string FunctionName { get; }
         string FunctionParameters { get; }
-        string Add { get; }
+        string AddFunction { get; }
         string FunctionWithNameAlreadyAdded { get; }
         string InvalidFileType { get; }
         string UnsavedChanges { get; }

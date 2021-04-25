@@ -8,7 +8,13 @@
         <StackPanel>
             <Grid Width="450" Height="450">
                 <d3:Chart IsXAxisReversed="False" BottomTitle="{Binding TextLocalization.Temperature}" LeftTitle="{Binding TextLocalization.AbsoluteMark}">
-                    <ItemsControl ItemsSource="{Binding Lines}"></ItemsControl>
+                    <d3:LineGraph 
+                        Description="{Binding ActiveFunction.Name}"
+                        Stroke="Blue"
+                        StrokeThickness="2"
+                        Width="450"
+                        Height="450"
+                        Points="{Binding ActiveFunction.PointCollection}"/>
                 </d3:Chart>
             </Grid>
         </StackPanel>

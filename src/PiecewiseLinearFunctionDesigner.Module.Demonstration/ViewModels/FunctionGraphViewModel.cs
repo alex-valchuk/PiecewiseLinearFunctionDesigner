@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
-using System.Windows.Media;
 using InteractiveDataDisplay.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
@@ -53,53 +51,34 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
-            _eventAggregator.GetEvent<PointsChangedEvent>().Subscribe(PointsChangedEventReceived);
         }
 
         private async void ProjectSpecifiedEventReceived()
         {
             ActiveProject = await _projectService.LoadProjectAsync();
-            Lines = BuildLinesGraph(ActiveProject.Functions.FirstOrDefault());
             ControlVisibility = Visibility.Visible;
         }
 
-        private static List<LineGraph> BuildLinesGraph(Function function)
+        private Function _activeFunction;
+        public Function ActiveFunction
         {
-            if (function == null)
-                return new List<LineGraph>();
-            
-            var lineGraph = new LineGraph
-            {
-                Stroke = new SolidColorBrush(Color.FromRgb(255, 25, 25)),
-                Description = function.Name,
-                StrokeThickness = 2,
-                Width = 450,
-                Height = 450,
-                Points = new PointCollection(function.Points.Select(p => new System.Windows.Point(p.X, p.Y)))
-            };
-
-            return new List<LineGraph> {lineGraph};
+            get => _activeFunction;
+            set => SetProperty(ref _activeFunction, value);
         }
 
         private string _functionName;
-        private void FunctionSpecifiedEventReceived(string functionName)
+        private async void FunctionSpecifiedEventReceived(string functionName)
         {
+            ActiveProject ??= await _projectService.LoadProjectAsync();
+            
             _functionName = functionName;
-            Lines = BuildLinesGraph(ActiveProject?.GetFunctionByName(functionName));
+            ActiveFunction = ActiveProject.GetFunctionByName(functionName);
         }
 
         private void ProjectClosedEventReceived()
         {
             Lines = null;
             ControlVisibility = Visibility.Collapsed;
-        }
-
-        private void PointsChangedEventReceived()
-        {
-            if (string.IsNullOrWhiteSpace(_functionName))
-                return;
-            
-            Lines = BuildLinesGraph(ActiveProject.GetFunctionByName(_functionName));
         }
     }
 }

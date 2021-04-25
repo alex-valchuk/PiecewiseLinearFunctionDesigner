@@ -8,7 +8,8 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel>
-        <DataGrid ItemsSource="{Binding Points, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" AutoGenerateColumns="False" ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="300">
+        <DataGrid ItemsSource="{Binding Points}" AutoGenerateColumns="False" ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="300"
+                  >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Абсолютная отметка" Binding="{Binding Path=X}" Width="1*" CanUserSort="False" />
                 <DataGridTextColumn Header="Температура" Binding="{Binding Path=Y}" Width="1*" CanUserSort="False" />

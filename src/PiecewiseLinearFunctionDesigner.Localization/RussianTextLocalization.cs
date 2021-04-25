@@ -7,7 +7,7 @@
         public string Function => "Функция";
         public string FunctionName => "Имя функции";
         public string FunctionParameters => "Параметры функции";
-        public string Add => "Добавить";
+        public string AddFunction => "Добавить функцию";
         public string FunctionWithNameAlreadyAdded => "Функция с именем '{0}' уже существует";
         public string InvalidFileType => "Неверный формат файла";
         public string UnsavedChanges => "Есть несохраненные изменения.";

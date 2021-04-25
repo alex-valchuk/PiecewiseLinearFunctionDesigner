@@ -1,4 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text.Json.Serialization;
+using System.Windows.Media;
 using Prism.Mvvm;
 
 namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
@@ -19,5 +22,9 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
             get => _points;
             set => SetProperty(ref _points, value);
         }
+
+        [JsonIgnore]
+        public PointCollection PointCollection =>
+            new PointCollection(Points.Select(p => new System.Windows.Point(p.X, p.Y)));
     }
 }
