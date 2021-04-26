@@ -4,7 +4,6 @@ using Prism.Mvvm;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
-using PiecewiseLinearFunctionDesigner.Core.Const;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -49,6 +48,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         }
 
         public DelegateCommand AddFunctionCommand { get; }
+        
         public DelegateCommand SelectFunctionCommand { get; }
 
         public FunctionListViewModel(
@@ -76,7 +76,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             });
 
             SelectedFunction = project.Functions.Last().Name;
-            _eventAggregator.GetEvent<MessageSentEvent>().Publish(MessageMarkers.AnyChangeMade);
+            _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
         }
 
         private string GetNewFunctionName(Project project, int attempt = 0)

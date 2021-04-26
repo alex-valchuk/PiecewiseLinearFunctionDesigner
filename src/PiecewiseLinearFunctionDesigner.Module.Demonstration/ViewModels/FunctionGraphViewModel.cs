@@ -74,6 +74,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
 
         private void ActiveFunctionOnPropertyChanged()
         {
+            _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
         }
 

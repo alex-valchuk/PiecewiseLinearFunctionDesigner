@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
-using PiecewiseLinearFunctionDesigner.Core.Const;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
@@ -21,6 +20,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
         private readonly IProjectService _projectService;
         private readonly IMessageService _messageService;
         private readonly ITextLocalization _textLocalization;
+        
+        private string _filePath;
 
         private Visibility _saveVisibility = Visibility.Collapsed;
         public Visibility SaveVisibility
@@ -40,19 +41,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             {
                 SetProperty(ref _isSaveEnabled, value);
                 SaveCommand.RaiseCanExecuteChanged();
-                SaveAndCloseCommand.RaiseCanExecuteChanged();
             }
         }
         
-        public DelegateCommand NewCommand { get; private set; }
+        public DelegateCommand NewCommand { get; }
         
-        public DelegateCommand OpenCommand { get; private set; }
+        public DelegateCommand OpenCommand { get; }
         
-        public DelegateCommand SaveCommand { get; private set; }
+        public DelegateCommand SaveCommand { get; }
         
-        public DelegateCommand SaveAndCloseCommand { get; private set; }
-        
-        public DelegateCommand ExitCommand { get; private set; }
+        public DelegateCommand ExitCommand { get; }
 
         public MenuViewModel(
             IEventAggregator eventAggregator,
@@ -67,18 +65,12 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             _messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
             _textLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
 
-            _eventAggregator.GetEvent<MessageSentEvent>().Subscribe(AnyChangeMadeMessageReceived, ThreadOption.PublisherThread, false, filter => filter.Contains(MessageMarkers.AnyChangeMade));
-
             NewCommand = new DelegateCommand(ExecuteNewCommand);
             OpenCommand = new DelegateCommand(ExecuteOpenCommand);
             SaveCommand = new DelegateCommand(ExecuteSaveCommand, CanExecuteSaveCommand);
-            SaveAndCloseCommand = new DelegateCommand(ExecuteSaveAndCloseCommand, CanExecuteSaveCommand);
             ExitCommand = new DelegateCommand(ExecuteExitCommand);
-        }
 
-        private void AnyChangeMadeMessageReceived(string message)
-        {
-            IsSaveEnabled = true;
+            _eventAggregator.GetEvent<AnyChangeMadeEvent>().Subscribe(AnyChangeMadeMessageReceived);
         }
 
         private void ExecuteNewCommand()
@@ -98,11 +90,11 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
 
         private async void ExecuteOpenCommand()
         {
-            if (_fileSystemService.OpenFile(out var selectedFile))
+            if (_fileSystemService.OpenFile(out _filePath))
             {
                 try
                 {
-                    await _projectService.SetActiveProjectAsync(selectedFile);
+                    await _projectService.SetActiveProjectAsync(_filePath);
                     _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
 
                     SaveVisibility = Visibility.Visible;
@@ -119,39 +111,27 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             await SaveProjectAsync();
         }
 
-        private async Task<bool> SaveProjectAsync()
+        private async Task SaveProjectAsync()
         {
-            if (_fileSystemService.OpenFile(out var filePath))
+            if (!string.IsNullOrWhiteSpace(_filePath) || 
+                _fileSystemService.OpenFile(out _filePath))
             {
                 try
                 {
-                    await _projectService.SaveActiveProjectAsync(filePath);
+                    await _projectService.SaveActiveProjectAsync(_filePath);
                     _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
                     IsSaveEnabled = false;
-                    return true;
                 }
                 catch (InvalidFileTypeException)
                 {
                     _messageService.ShowMessage(string.Format(_textLocalization.InvalidFileType));
                 }
             }
-
-            return false;
         }
 
         private bool CanExecuteSaveCommand()
         {
             return SaveVisibility == Visibility.Visible && IsSaveEnabled;
-        }
-
-        private async void ExecuteSaveAndCloseCommand()
-        {
-            if (await SaveProjectAsync())
-            {
-                _projectService.SetActiveProject(null);
-                _eventAggregator.GetEvent<ProjectClosedEvent>().Publish();
-                SaveVisibility = Visibility.Collapsed;
-            }
         }
 
         private void ExecuteExitCommand()
@@ -167,6 +147,11 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             {
                 SaveVisibility = Visibility.Collapsed;
             }
+        }
+
+        private void AnyChangeMadeMessageReceived()
+        {
+            IsSaveEnabled = true;
         }
     }
 }

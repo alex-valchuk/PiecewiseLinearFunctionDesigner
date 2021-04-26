@@ -8,10 +8,15 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private string _name;
         public string Name
         {
-            get;
-            set;
+            get => _name;
+            set
+            {
+                _name = value;
+                PropertyChanged?.Invoke();
+            }
         }
 
         private List<Point> _points;
