@@ -57,15 +57,15 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
-        private async void ProjectSpecifiedEventReceived()
+        private void ProjectSpecifiedEventReceived()
         {
-            ActiveProject = await _projectService.LoadProjectAsync();
+            ActiveProject = _projectService.ActiveProject;
             ControlVisibility = Visibility.Visible;
         }
 
-        private async void FunctionSpecifiedEventReceived(string functionName)
+        private void FunctionSpecifiedEventReceived(string functionName)
         {
-            ActiveProject ??= await _projectService.LoadProjectAsync();
+            ActiveProject ??= _projectService.ActiveProject;
             
             ActiveFunction = ActiveProject.GetFunctionByName(functionName);
             ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;

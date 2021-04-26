@@ -74,9 +74,9 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             DeletePointCommand = new DelegateCommand(ExecuteDeletePointCommand, CanExecuteDeletePointCommand);
         }
 
-        private async void FunctionSpecifiedEventReceived(string activeFunction)
+        private void FunctionSpecifiedEventReceived(string activeFunction)
         {
-            var project = await _projectService.LoadProjectAsync();
+            var project = _projectService.ActiveProject;
 
             ActiveFunction = project.GetFunctionByName(activeFunction);
             Points = new ObservableCollection<Point>(ActiveFunction.Points);

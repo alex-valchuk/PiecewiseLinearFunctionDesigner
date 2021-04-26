@@ -10,21 +10,27 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
 {
     public interface IProjectService
     {
-        Task SetActiveProjectAsync(string filePath);
-        
+        Project ActiveProject { get; }
+           
         void SetActiveProject(Project project);
-
-        bool HasActiveProject();
-        
-        Task<Project> LoadProjectAsync();
+     
+        Task SetActiveProjectAsync(string filePath);
         
         Task SaveActiveProjectAsync(string filePath);
     }
 
     public class ProjectService : IProjectService
     {
-        private string _activeProjectFilePath;
-        private Project _activeProject;
+        public Project ActiveProject
+        {
+            get;
+            private set;
+        }
+
+        public void SetActiveProject(Project project)
+        {
+            ActiveProject = project;
+        }
 
         public async Task SetActiveProjectAsync(string filePath)
         {
@@ -37,39 +43,23 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             if (!File.Exists(filePath))
                 throw new InvalidOperationException("The path is invalid.");
 
-            _activeProjectFilePath = filePath;
-            _activeProject = null;
-
-            _activeProject = await LoadProjectAsync();
+            ActiveProject = await LoadProjectAsync(filePath);
         }
 
-        public void SetActiveProject(Project project)
+        private async Task<Project> LoadProjectAsync(string filePath)
         {
-            _activeProject = project;
-        }
-
-        public bool HasActiveProject()
-        {
-            return _activeProject != null;
-        }
-
-        public async Task<Project> LoadProjectAsync()
-        {
-            if (HasActiveProject())
-                return _activeProject;
-            
-            if (string.IsNullOrWhiteSpace(_activeProjectFilePath))
+            if (string.IsNullOrWhiteSpace(filePath))
                 throw new InvalidOperationException($"You must first specify the active project file path by calling {nameof(SetActiveProjectAsync)} method.");
             
-            if (!File.Exists(_activeProjectFilePath))
+            if (!File.Exists(filePath))
                 throw new InvalidOperationException("The active project file path is invalid.");
 
             try
             {
-                var projectContent = await File.ReadAllTextAsync(_activeProjectFilePath);
-                _activeProject = JsonConvert.DeserializeObject<Project>(projectContent);
+                var projectContent = await File.ReadAllTextAsync(filePath);
+                ActiveProject = JsonConvert.DeserializeObject<Project>(projectContent);
 
-                return _activeProject;
+                return ActiveProject;
             }
             catch (JsonReaderException ex)
             {
@@ -79,7 +69,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
 
         public Task SaveActiveProjectAsync(string filePath)
         {
-            if (_activeProject == null)
+            if (ActiveProject == null)
                 throw new InvalidOperationException("The active project is not specified.");
             
             if (string.IsNullOrWhiteSpace(filePath))
@@ -88,7 +78,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             /*if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
                 throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);*/
 
-            var projectContent = JsonConvert.SerializeObject(_activeProject);
+            var projectContent = JsonConvert.SerializeObject(ActiveProject);
             return File.WriteAllTextAsync(filePath, projectContent);
         }
     }

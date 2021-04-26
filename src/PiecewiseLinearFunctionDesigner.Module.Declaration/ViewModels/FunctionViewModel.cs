@@ -45,9 +45,9 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
         }
 
-        private async void FunctionSpecifiedEventReceived(string selectedFunction)
+        private void FunctionSpecifiedEventReceived(string selectedFunction)
         {
-            var project = await _projectService.LoadProjectAsync();
+            var project = _projectService.ActiveProject;
             ActiveFunction = project.GetFunctionByName(selectedFunction);
             ControlVisibility = Visibility.Visible;
         }

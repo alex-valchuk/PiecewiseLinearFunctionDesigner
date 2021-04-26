@@ -67,9 +67,9 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
-        private async void HandleAddFunctionCommand()
+        private void HandleAddFunctionCommand()
         {
-            var project = await _projectService.LoadProjectAsync();
+            var project = _projectService.ActiveProject;
             project.Functions.Add(new Function
             {
                 Name = GetNewFunctionName(project)
@@ -94,9 +94,9 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
         }
 
-        private async void ProjectSpecifiedEventReceived()
+        private void ProjectSpecifiedEventReceived()
         {
-            var project = await _projectService.LoadProjectAsync();
+            var project = _projectService.ActiveProject;
             Functions = project.Functions;
             SelectedFunction = project.Functions.FirstOrDefault()?.Name;
             ControlVisibility = Visibility.Visible;
