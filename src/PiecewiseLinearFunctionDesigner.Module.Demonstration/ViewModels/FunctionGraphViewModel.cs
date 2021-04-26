@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
-using InteractiveDataDisplay.Core;
+using System.Windows.Media;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -16,13 +17,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly IProjectService _projectService;
 
-        public IList<LineGraph> _lines = new List<LineGraph>();
-        public IList<LineGraph> Lines
-        {
-            get => _lines;
-            set => SetProperty(ref _lines, value);
-        }
-
         private Visibility _controlVisibility = Visibility.Collapsed;
         public Visibility ControlVisibility
         {
@@ -36,6 +30,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             get => _activeProject;
             set => SetProperty(ref _activeProject, value);
         }
+
+        private Function _activeFunction;
+        public Function ActiveFunction
+        {
+            get => _activeFunction;
+            set => SetProperty(ref _activeFunction, value);
+        }
+
+        public PointCollection PointCollection =>
+            new PointCollection(ActiveFunction.Points.Select(p => new System.Windows.Point(p.X, p.Y)));
 
         public ITextLocalization TextLocalization { get; }
 
@@ -59,25 +63,22 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             ControlVisibility = Visibility.Visible;
         }
 
-        private Function _activeFunction;
-        public Function ActiveFunction
-        {
-            get => _activeFunction;
-            set => SetProperty(ref _activeFunction, value);
-        }
-
-        private string _functionName;
         private async void FunctionSpecifiedEventReceived(string functionName)
         {
             ActiveProject ??= await _projectService.LoadProjectAsync();
             
-            _functionName = functionName;
             ActiveFunction = ActiveProject.GetFunctionByName(functionName);
+            ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
+        }
+
+        private void ActiveFunctionOnPropertyChanged()
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
         }
 
         private void ProjectClosedEventReceived()
         {
-            Lines = null;
             ControlVisibility = Visibility.Collapsed;
         }
     }

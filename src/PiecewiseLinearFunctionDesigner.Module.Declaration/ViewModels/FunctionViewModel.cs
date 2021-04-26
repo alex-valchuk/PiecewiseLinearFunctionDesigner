@@ -16,13 +16,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 
         public ITextLocalization TextLocalization { get; }
 
-        private Function _selectedFunction;
-        public Function SelectedFunction
-        {
-            get => _selectedFunction;
-            set => SetProperty(ref _selectedFunction, value);
-        }
-
         private Visibility _controlVisibility = Visibility.Collapsed;
         public Visibility ControlVisibility
         {
@@ -31,6 +24,13 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             {
                 SetProperty(ref _controlVisibility, value);
             }
+        }
+
+        private Function _activeFunction;
+        public Function ActiveFunction
+        {
+            get => _activeFunction;
+            set => SetProperty(ref _activeFunction, value);
         }
 
         public FunctionViewModel(
@@ -48,7 +48,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private async void FunctionSpecifiedEventReceived(string selectedFunction)
         {
             var project = await _projectService.LoadProjectAsync();
-            SelectedFunction = project.GetFunctionByName(selectedFunction);
+            ActiveFunction = project.GetFunctionByName(selectedFunction);
             ControlVisibility = Visibility.Visible;
         }
     }

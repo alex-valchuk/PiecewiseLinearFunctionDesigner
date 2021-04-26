@@ -1,30 +1,47 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
-using System.Windows.Media;
-using Prism.Mvvm;
 
 namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
-    public class Function : BindableBase
+    public class Function
     {
-        private string _name;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string Name
         {
-            get => _name;
-            set => SetProperty(ref _name, value);
+            get;
+            set;
         }
 
-        private ObservableCollection<Point> _points = new ObservableCollection<Point>();
-        public ObservableCollection<Point> Points
+        private List<Point> _points;
+        public IReadOnlyList<Point> Points
         {
             get => _points;
-            set => SetProperty(ref _points, value);
+            set => _points = value.ToList();
         }
 
-        [JsonIgnore]
-        public PointCollection PointCollection =>
-            new PointCollection(Points.Select(p => new System.Windows.Point(p.X, p.Y)));
+        public Function()
+        {
+            Point.PropertyChanged += () => PropertyChanged?.Invoke();
+        }
+
+        public void AddPoint(Point point)
+        {
+            if (point == null)
+                throw new ArgumentNullException(nameof(point));
+            
+            _points.Add(point);
+            PropertyChanged?.Invoke();
+        }
+
+        public void DeletePoint(Point point)
+        {
+            if (point == null)
+                throw new ArgumentNullException(nameof(point));
+
+            _points.Remove(point);
+            PropertyChanged?.Invoke();
+        }
     }
 }

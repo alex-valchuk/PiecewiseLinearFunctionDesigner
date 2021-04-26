@@ -1,23 +1,31 @@
-﻿using Prism.Mvvm;
-
-namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
+﻿namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
-    public class Point : BindableBase
+    public delegate void PropertyChangedEventHandler();
+    
+    public class Point
     {
+        public static event PropertyChangedEventHandler PropertyChanged;
+        
         private double _x;
-
         public double X
         {
             get => _x;
-            set => SetProperty(ref _x, value);
+            set
+            {
+                _x = value;
+                PropertyChanged?.Invoke();
+            }
         }
 
         private double _y;
-
         public double Y
         {
             get => _y;
-            set => SetProperty(ref _y, value);
+            set
+            {
+                _y = value;
+                PropertyChanged?.Invoke();
+            }
         }
     }
 }

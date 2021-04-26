@@ -6,14 +6,43 @@
              xmlns:prism="http://prismlibrary.com/"
              prism:ViewModelLocator.AutoWireViewModel="True"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <StackPanel>
-        <DataGrid ItemsSource="{Binding Points}" AutoGenerateColumns="False" ScrollViewer.VerticalScrollBarVisibility="Auto" MaxHeight="300"
-                  >
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Абсолютная отметка" Binding="{Binding Path=X}" Width="1*" CanUserSort="False" />
-                <DataGridTextColumn Header="Температура" Binding="{Binding Path=Y}" Width="1*" CanUserSort="False" />
-            </DataGrid.Columns>
-        </DataGrid>
-    </StackPanel>
+             d:DesignHeight="400" d:DesignWidth="300">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="130"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <DataGrid Grid.Row="0" Grid.ColumnSpan="2"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                SelectedIndex="{Binding SelectedPoint, Mode=TwoWay}"
+                SelectionMode="Single"
+                ItemsSource="{Binding Points}"
+                AutoGenerateColumns="False"
+                CanUserDeleteRows="False"
+                CanUserAddRows="False"
+                MaxHeight="300">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Абсолютная отметка" Binding="{Binding Path=X}" Width="1*" CanUserSort="False" />
+                    <DataGridTextColumn Header="Температура" Binding="{Binding Path=Y}" Width="1*" CanUserSort="False" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Grid.Row="1" Grid.Column="0"
+                Command="{Binding AddPointCommand}"
+                HorizontalAlignment="Left"
+                Content="Добавить"
+                Margin="0 10 0 0"
+                Width="120" 
+            />
+            <Button Grid.Row="1" Grid.Column="1"
+                    Command="{Binding DeletePointCommand}"
+                    HorizontalAlignment="Left"
+                    Content="Удалить"
+                    Margin="0 10 0 0"
+                    Width="120" 
+            />
+        </Grid>
 </UserControl>

@@ -14,7 +14,7 @@
                         StrokeThickness="2"
                         Width="450"
                         Height="450"
-                        Points="{Binding ActiveFunction.PointCollection}"/>
+                        Points="{Binding PointCollection}"/>
                 </d3:Chart>
             </Grid>
         </StackPanel>

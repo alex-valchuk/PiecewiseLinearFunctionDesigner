@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+using System.Linq;
+using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -8,6 +9,7 @@ using PiecewiseLinearFunctionDesigner.Localization;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Point = PiecewiseLinearFunctionDesigner.DomainModel.Models.Point;
 
 namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 {
@@ -18,20 +20,44 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         
         public ITextLocalization TextLocalization { get; }
 
+        private Visibility _controlVisibility = Visibility.Collapsed;
+        public Visibility ControlVisibility
+        {
+            get { return _controlVisibility; }
+            set
+            {
+                SetProperty(ref _controlVisibility, value);
+            }
+        }
+
         private ObservableCollection<Point> _points = new ObservableCollection<Point>();
         public ObservableCollection<Point> Points
         {
             get => _points;
+            set => SetProperty(ref _points, value);
+        }
+
+        private int _selectedPoint;
+        public int SelectedPoint
+        {
+            get => _selectedPoint;
             set
             {
-                SetProperty(ref _points, value);
-                PointChangedCommand.Execute();
+                SetProperty(ref _selectedPoint, value);
+                DeletePointCommand.RaiseCanExecuteChanged();
             }
         }
 
-        public DelegateCommand RowEditEnding;
+        private Function _activeFunction;
+        public Function ActiveFunction
+        {
+            get => _activeFunction;
+            set => SetProperty(ref _activeFunction, value);
+        }
 
-        public DelegateCommand PointChangedCommand;
+        public DelegateCommand AddPointCommand { get; }
+
+        public DelegateCommand DeletePointCommand { get; }
 
         public PointListViewModel(
             IEventAggregator eventAggregator,
@@ -41,32 +67,43 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
-
-            PointChangedCommand = new DelegateCommand(HandlePointChangedCommand);
-            RowEditEnding = new DelegateCommand(HandleRowEditEnding);
             
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
+
+            AddPointCommand = new DelegateCommand(ExecuteAddPointCommand);
+            DeletePointCommand = new DelegateCommand(ExecuteDeletePointCommand, CanExecuteDeletePointCommand);
         }
 
-        private void HandleRowEditEnding()
-        {
-            _eventAggregator.GetEvent<PointsChangedEvent>().Publish();
-        }
-
-        private void HandlePointChangedCommand()
-        {
-            _eventAggregator.GetEvent<PointsChangedEvent>().Publish();
-        }
-
-        private async void FunctionSpecifiedEventReceived(string selectedFunction)
+        private async void FunctionSpecifiedEventReceived(string activeFunction)
         {
             var project = await _projectService.LoadProjectAsync();
 
-            var function = project.GetFunctionByName(selectedFunction);
-            if (function == null)
-                return;
+            ActiveFunction = project.GetFunctionByName(activeFunction);
+            Points = new ObservableCollection<Point>(ActiveFunction.Points);
+            SelectedPoint = -1;
+            ControlVisibility = Visibility.Visible;
+        }
 
-            Points = function.Points;
+        private void ExecuteAddPointCommand()
+        {
+            var lastPoint = ActiveFunction.Points.Last();
+            ActiveFunction.AddPoint(new Point
+            {
+                X = lastPoint?.X ?? 0,
+                Y = lastPoint?.Y ?? 0
+            });
+            Points = new ObservableCollection<Point>(ActiveFunction.Points);
+        }
+
+        private void ExecuteDeletePointCommand()
+        {
+            ActiveFunction.DeletePoint(ActiveFunction.Points[SelectedPoint]);
+            Points = new ObservableCollection<Point>(ActiveFunction.Points);
+        }
+
+        private bool CanExecuteDeletePointCommand()
+        {
+            return SelectedPoint >= 0;
         }
     }
 }

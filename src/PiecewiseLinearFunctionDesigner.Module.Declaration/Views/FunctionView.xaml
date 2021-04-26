@@ -19,7 +19,7 @@
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding TextLocalization.FunctionName}" Grid.Row="0" Grid.Column="0"></TextBlock>
-            <TextBox Text="{Binding SelectedFunction.Name}" Grid.Row="0" Grid.Column="1"></TextBox>
+            <TextBox Text="{Binding ActiveFunction.Name}" Grid.Row="0" Grid.Column="1"></TextBox>
             <local:PointListView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 25 0 0"></local:PointListView>
         </Grid>
     </GroupBox>
