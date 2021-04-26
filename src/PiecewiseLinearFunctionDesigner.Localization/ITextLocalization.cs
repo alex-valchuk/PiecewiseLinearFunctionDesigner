@@ -11,7 +11,7 @@
         string FunctionWithNameAlreadyAdded { get; }
         string InvalidFileType { get; }
         string UnsavedChanges { get; }
-        string AreYouSureYouWantToCloseActiveProject { get; }
+        string DoYouWannaSaveChangesBeforeExit { get; }
         string ProjectSuccessfullySaved { get; }
         string Temperature { get; }
         string AbsoluteMark { get; }

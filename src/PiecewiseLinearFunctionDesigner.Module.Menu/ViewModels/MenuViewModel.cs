@@ -4,7 +4,6 @@ using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
-using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using PiecewiseLinearFunctionDesigner.Localization;
 using Prism.Commands;
@@ -77,7 +76,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
         {
             if (IsSaveEnabled)
             {
-                if (!_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.AreYouSureYouWantToCloseActiveProject))
+                if (!_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.DoYouWannaSaveChangesBeforeExit))
                     return;
             }
 
@@ -111,7 +110,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             await SaveProjectAsync();
         }
 
-        private async Task SaveProjectAsync()
+        private async Task SaveProjectAsync(bool showConfirmation = true)
         {
             if (!string.IsNullOrWhiteSpace(_filePath) || 
                 _fileSystemService.OpenFile(out _filePath))
@@ -119,7 +118,12 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
                 try
                 {
                     await _projectService.SaveActiveProjectAsync(_filePath);
-                    _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
+
+                    if (showConfirmation)
+                    {
+                        _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
+                    }
+                    
                     IsSaveEnabled = false;
                 }
                 catch (InvalidFileTypeException)
@@ -134,19 +138,17 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             return SaveVisibility == Visibility.Visible && IsSaveEnabled;
         }
 
-        private void ExecuteExitCommand()
+        private async void ExecuteExitCommand()
         {
             if (IsSaveEnabled)
             {
-                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.AreYouSureYouWantToCloseActiveProject))
+                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.DoYouWannaSaveChangesBeforeExit))
                 {
-                    SaveVisibility = Visibility.Collapsed;
+                    await SaveProjectAsync(false);
                 }
             }
-            else
-            {
-                SaveVisibility = Visibility.Collapsed;
-            }
+            
+            Application.Current.Shutdown();
         }
 
         private void AnyChangeMadeMessageReceived()

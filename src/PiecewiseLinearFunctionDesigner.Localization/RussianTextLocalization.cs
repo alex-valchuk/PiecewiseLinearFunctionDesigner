@@ -11,7 +11,7 @@
         public string FunctionWithNameAlreadyAdded => "Функция с именем '{0}' уже существует";
         public string InvalidFileType => "Неверный формат файла";
         public string UnsavedChanges => "Есть несохраненные изменения.";
-        public string AreYouSureYouWantToCloseActiveProject => "Уверены, что хотите закрыть текущий проект?";
+        public string DoYouWannaSaveChangesBeforeExit => "Не хотите сохранить изменеия перед выходом?";
         public string ProjectSuccessfullySaved => "Проект успешно сохранен";
         public string Temperature => "Температура";
         public string AbsoluteMark => "Абсолютная отметка";
