@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Linq;
 using Prism.Mvvm;
 
@@ -7,8 +7,8 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
     public class Project : BindableBase
     {
-        private ObservableCollection<Function> _functions = new ObservableCollection<Function>();
-        public ObservableCollection<Function> Functions
+        private List<Function> _functions = new List<Function>();
+        public List<Function> Functions
         {
             get => _functions;
             set => SetProperty(ref _functions, value);
@@ -16,5 +16,13 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 
         public Function GetFunctionByName(string functionName) =>
             Functions.FirstOrDefault(f => f.Name.Equals(functionName, StringComparison.InvariantCultureIgnoreCase));
+
+        public void AddNewFunction(string functionName)
+        {
+            Functions.Add(new Function
+            {
+                Name = functionName
+            });
+        }
     }
 }

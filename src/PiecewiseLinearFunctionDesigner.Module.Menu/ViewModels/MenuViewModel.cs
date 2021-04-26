@@ -81,7 +81,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
                     return;
             }
 
-            _projectService.SetActiveProject(new Project());
+            _projectService.AddNewProject();
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
                 
             SaveVisibility = Visibility.Visible;
@@ -97,7 +97,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
                     await _projectService.SetActiveProjectAsync(_filePath);
                     _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
 
-                    SaveVisibility = Visibility.Visible;
+                    SaveVisibility = Visibility.Collapsed;
                 }
                 catch (InvalidFileTypeException)
                 {

@@ -60,22 +60,41 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
 
-            AddFunctionCommand = new DelegateCommand(HandleAddFunctionCommand);
-            SelectFunctionCommand = new DelegateCommand(HandleSelectFunctionCommand);
-
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
+
+            AddFunctionCommand = new DelegateCommand(HandleAddFunctionCommand);
+            SelectFunctionCommand = new DelegateCommand(HandleSelectFunctionCommand);
+        }
+
+        private void ProjectSpecifiedEventReceived()
+        {
+            var project = _projectService.ActiveProject;
+            Functions = new ObservableCollection<Function>(project.Functions);
+            if (project.Functions.Any())
+            {
+                SelectedFunction = project.Functions.First().Name;
+                _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
+            }
+            
+            ControlVisibility = Visibility.Visible;
+        }
+    
+        private void ProjectClosedEventReceived()
+        {
+            Functions = null;
+            ControlVisibility = Visibility.Collapsed;
         }
 
         private void HandleAddFunctionCommand()
         {
             var project = _projectService.ActiveProject;
-            project.Functions.Add(new Function
-            {
-                Name = GetNewFunctionName(project)
-            });
+            project.AddNewFunction(GetNewFunctionName(project));
 
+            Functions = new ObservableCollection<Function>(project.Functions);
             SelectedFunction = project.Functions.Last().Name;
+            
+            _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
         }
 
@@ -92,25 +111,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private void HandleSelectFunctionCommand()
         {
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
-        }
-
-        private void ProjectSpecifiedEventReceived()
-        {
-            var project = _projectService.ActiveProject;
-            Functions = project.Functions;
-            SelectedFunction = project.Functions.FirstOrDefault()?.Name;
-            ControlVisibility = Visibility.Visible;
-
-            if (!string.IsNullOrWhiteSpace(SelectedFunction))
-            {
-                _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
-            }
-        }
-    
-        private void ProjectClosedEventReceived()
-        {
-            Functions = null;
-            ControlVisibility = Visibility.Collapsed;
         }
     }
 }

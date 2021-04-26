@@ -12,7 +12,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
     {
         Project ActiveProject { get; }
            
-        void SetActiveProject(Project project);
+        void AddNewProject();
      
         Task SetActiveProjectAsync(string filePath);
         
@@ -27,9 +27,9 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             private set;
         }
 
-        public void SetActiveProject(Project project)
+        public void AddNewProject()
         {
-            ActiveProject = project;
+            ActiveProject = new Project();
         }
 
         public async Task SetActiveProjectAsync(string filePath)

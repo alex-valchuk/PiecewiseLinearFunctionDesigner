@@ -19,7 +19,7 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
             }
         }
 
-        private List<Point> _points;
+        private List<Point> _points = new List<Point>();
         public IReadOnlyList<Point> Points
         {
             get => _points;
