@@ -20,11 +20,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private Visibility _controlVisibility = Visibility.Collapsed;
         public Visibility ControlVisibility
         {
-            get { return _controlVisibility; }
-            set
-            {
-                SetProperty(ref _controlVisibility, value);
-            }
+            get => _controlVisibility;
+            set => SetProperty(ref _controlVisibility, value);
         }
 
         public ITextLocalization TextLocalization { get; }
@@ -32,8 +29,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private ObservableCollection<Function> _functions = new ObservableCollection<Function>();
         public ObservableCollection<Function> Functions
         {
-            get { return _functions; }
-            set { SetProperty(ref _functions, value); }
+            get => _functions;
+            set => SetProperty(ref _functions, value);
         }
 
         private string _selectedFunction;

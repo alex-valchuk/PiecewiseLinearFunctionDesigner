@@ -22,7 +22,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         private Visibility _controlVisibility = Visibility.Collapsed;
         public Visibility ControlVisibility
         {
-            get { return _controlVisibility; }
+            get => _controlVisibility;
             set => SetProperty(ref _controlVisibility, value);
         }
 
