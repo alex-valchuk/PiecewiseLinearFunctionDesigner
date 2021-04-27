@@ -14,9 +14,11 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="130"></ColumnDefinition>
+                <ColumnDefinition Width="210"></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
                 <ColumnDefinition></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <DataGrid Grid.Row="0" Grid.ColumnSpan="2"
+            <DataGrid Grid.Row="0" Grid.ColumnSpan="4"
                 ScrollViewer.VerticalScrollBarVisibility="Auto"
                 SelectedIndex="{Binding SelectedPoint, Mode=TwoWay}"
                 SelectionMode="Single"
@@ -44,5 +46,19 @@
                     Margin="0 10 0 0"
                     Width="120" 
             />
-        </Grid>
+            <Button Grid.Row="1" Grid.Column="2"
+                    Command="{Binding CopyToClipboardCommand}"
+                    HorizontalAlignment="Right"
+                    Content="В буфер"
+                    Margin="0 10 0 0"
+                    Width="80" 
+            />
+            <Button Grid.Row="1" Grid.Column="3"
+                    Command="{Binding GetFromClipboardCommand}"
+                    HorizontalAlignment="Right"
+                    Content="Из буфера"
+                    Margin="0 10 0 0"
+                    Width="80" 
+            />
+    </Grid>
 </UserControl>

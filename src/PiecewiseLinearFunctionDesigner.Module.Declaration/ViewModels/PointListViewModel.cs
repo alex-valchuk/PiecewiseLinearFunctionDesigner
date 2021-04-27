@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -14,9 +15,10 @@ using Point = PiecewiseLinearFunctionDesigner.DomainModel.Models.Point;
 namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 {
     public class PointListViewModel : BindableBase
-    { 
-        private readonly IEventAggregator _eventAggregator;
+    {
         private readonly IProjectService _projectService;
+        private readonly IClipboardService _clipboardService;
+        private readonly IPointsConverter _pointsConverter;
         
         public ITextLocalization TextLocalization { get; }
 
@@ -55,21 +57,31 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         public DelegateCommand AddPointCommand { get; }
 
         public DelegateCommand DeletePointCommand { get; }
+        
+        public DelegateCommand CopyToClipboardCommand { get; }
+        
+        public DelegateCommand GetFromClipboardCommand { get; }
 
         public PointListViewModel(
             IEventAggregator eventAggregator,
             ITextLocalization textLocalization,
-            IProjectService projectService)
+            IProjectService projectService,
+            IClipboardService clipboardService,
+            IPointsConverter pointsConverter)
         {
-            _eventAggregator = eventAggregator ?? throw new ArgumentNullException(nameof(eventAggregator));
+            if (eventAggregator == null) throw new ArgumentNullException(nameof(eventAggregator));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
-            
-            _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
-            _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
+            _clipboardService = clipboardService ?? throw new ArgumentNullException(nameof(clipboardService));
+            _pointsConverter = pointsConverter ?? throw new ArgumentNullException(nameof(pointsConverter));
+
+            eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
+            eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
 
             AddPointCommand = new DelegateCommand(ExecuteAddPointCommand);
             DeletePointCommand = new DelegateCommand(ExecuteDeletePointCommand, CanExecuteDeletePointCommand);
+            CopyToClipboardCommand = new DelegateCommand(ExecuteCopyToClipboardCommand);
+            GetFromClipboardCommand = new DelegateCommand(ExecuteGetFromClipboardCommand);
         }
 
         private void ProjectSpecifiedEventReceived()
@@ -110,6 +122,19 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private bool CanExecuteDeletePointCommand()
         {
             return SelectedPoint >= 0;
+        }
+
+        private void ExecuteCopyToClipboardCommand()
+        {
+            var str = _pointsConverter.ConvertToString(ActiveFunction.Points);
+            _clipboardService.SetText(str);
+        }
+
+        private void ExecuteGetFromClipboardCommand()
+        {
+            var str = _clipboardService.GetText();
+            ActiveFunction.Points = _pointsConverter.ConvertToPoints(str);
+            Points = new ObservableCollection<Point>(ActiveFunction.Points);
         }
     }
 }
