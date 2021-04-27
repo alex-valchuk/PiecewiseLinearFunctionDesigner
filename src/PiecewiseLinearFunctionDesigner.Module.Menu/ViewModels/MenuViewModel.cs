@@ -72,23 +72,38 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Subscribe(AnyChangeMadeMessageReceived);
         }
 
-        private void ExecuteNewCommand()
+        private async void ExecuteNewCommand()
         {
             if (IsSaveEnabled)
             {
-                if (!_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.DoYouWannaSaveChangesBeforeExit))
-                    return;
+                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges,
+                    _textLocalization.DoYouWannaSaveChangesBeforeExit))
+                {
+                    await SaveProjectAsync(false);
+                }
             }
 
+            _filePath = null;
+            
             _projectService.AddNewProject();
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
                 
             SaveVisibility = Visibility.Visible;
-            IsSaveEnabled = true;
+            IsSaveEnabled = false;
         }
 
         private async void ExecuteOpenCommand()
         {
+            if (IsSaveEnabled)
+            {
+                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges,
+                    _textLocalization.DoYouWannaSaveChangesBeforeExit))
+                {
+                    await SaveProjectAsync();
+                    return;
+                }
+            }
+            
             if (_fileSystemService.OpenFile(out _filePath))
             {
                 try
@@ -96,7 +111,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
                     await _projectService.SetActiveProjectAsync(_filePath);
                     _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Publish();
 
-                    SaveVisibility = Visibility.Collapsed;
+                    SaveVisibility = Visibility.Visible;
+                    IsSaveEnabled = false;
                 }
                 catch (InvalidFileTypeException)
                 {
@@ -153,6 +169,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
 
         private void AnyChangeMadeMessageReceived()
         {
+            SaveVisibility = Visibility.Visible;
             IsSaveEnabled = true;
         }
     }

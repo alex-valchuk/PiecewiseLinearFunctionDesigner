@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Prism.Mvvm;
 
 namespace PiecewiseLinearFunctionDesigner.DomainModel.Models
 {
-    public class Project : BindableBase
+    public class Project
     {
         private List<Function> _functions = new List<Function>();
         public List<Function> Functions
         {
             get => _functions;
-            set => SetProperty(ref _functions, value);
+            set => _functions = value;
         }
 
         public Function GetFunctionByName(string functionName) =>

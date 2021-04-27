@@ -69,11 +69,10 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 
         private void ProjectSpecifiedEventReceived()
         {
-            var project = _projectService.ActiveProject;
-            Functions = new ObservableCollection<Function>(project.Functions);
-            if (project.Functions.Any())
+            Functions = new ObservableCollection<Function>(_projectService.ActiveProject.Functions);
+            if (Functions.Any())
             {
-                SelectedFunction = project.Functions.First().Name;
+                SelectedFunction = Functions.First().Name;
                 _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
             }
             

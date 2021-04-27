@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -9,6 +10,7 @@ using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using Prism.Events;
 using Prism.Mvvm;
 using PiecewiseLinearFunctionDesigner.Localization;
+using Point = System.Windows.Point;
 
 namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
 {
@@ -24,13 +26,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             set => SetProperty(ref _controlVisibility, value);
         }
 
-        private Project _activeProject;
-        public Project ActiveProject
-        {
-            get => _activeProject;
-            set => SetProperty(ref _activeProject, value);
-        }
-
         private Function _activeFunction;
         public Function ActiveFunction
         {
@@ -39,7 +34,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         }
 
         public PointCollection PointCollection =>
-            new PointCollection(ActiveFunction.Points.Select(p => new System.Windows.Point(p.X, p.Y)));
+            new PointCollection(ActiveFunction?.Points?.Select(p => new Point(p.X, p.Y)) ?? new List<Point>());
 
         public ITextLocalization TextLocalization { get; }
 
@@ -59,23 +54,27 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
 
         private void ProjectSpecifiedEventReceived()
         {
-            ActiveProject = _projectService.ActiveProject;
+            ActiveFunction = _projectService.ActiveProject.Functions.FirstOrDefault();
+            NotifyPointCollectionChanged();
             ControlVisibility = Visibility.Visible;
+        }
+
+        private void NotifyPointCollectionChanged()
+        {
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
         }
 
         private void FunctionSpecifiedEventReceived(string functionName)
         {
-            ActiveProject ??= _projectService.ActiveProject;
-            
-            ActiveFunction = ActiveProject.GetFunctionByName(functionName);
+            ActiveFunction = _projectService.ActiveProject.GetFunctionByName(functionName);
             ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
+            NotifyPointCollectionChanged();
         }
 
         private void ActiveFunctionOnPropertyChanged()
         {
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
+            NotifyPointCollectionChanged();
         }
 
         private void ProjectClosedEventReceived()

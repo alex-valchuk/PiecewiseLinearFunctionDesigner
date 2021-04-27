@@ -68,17 +68,26 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
             
+            _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
 
             AddPointCommand = new DelegateCommand(ExecuteAddPointCommand);
             DeletePointCommand = new DelegateCommand(ExecuteDeletePointCommand, CanExecuteDeletePointCommand);
         }
 
+        private void ProjectSpecifiedEventReceived()
+        {
+            ActiveFunction = _projectService.ActiveProject.Functions.FirstOrDefault();
+            Points = new ObservableCollection<Point>();
+            SelectedPoint = -1;
+            ControlVisibility = ActiveFunction == null
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+        }
+
         private void FunctionSpecifiedEventReceived(string activeFunction)
         {
-            var project = _projectService.ActiveProject;
-
-            ActiveFunction = project.GetFunctionByName(activeFunction);
+            ActiveFunction = _projectService.ActiveProject.GetFunctionByName(activeFunction);
             Points = new ObservableCollection<Point>(ActiveFunction.Points);
             SelectedPoint = -1;
             ControlVisibility = Visibility.Visible;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
@@ -42,13 +43,21 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
 
+            _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
+        }
+
+        private void ProjectSpecifiedEventReceived()
+        {
+            ActiveFunction = _projectService.ActiveProject.Functions.FirstOrDefault();
+            ControlVisibility = ActiveFunction == null
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
         }
 
         private void FunctionSpecifiedEventReceived(string selectedFunction)
         {
-            var project = _projectService.ActiveProject;
-            ActiveFunction = project.GetFunctionByName(selectedFunction);
+            ActiveFunction = _projectService.ActiveProject.GetFunctionByName(selectedFunction);
             ControlVisibility = Visibility.Visible;
         }
     }
