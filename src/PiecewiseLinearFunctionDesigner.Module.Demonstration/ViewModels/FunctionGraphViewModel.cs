@@ -49,7 +49,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
-            _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
         }
 
         private void ProjectSpecifiedEventReceived()
@@ -75,11 +74,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         {
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
             NotifyPointCollectionChanged();
-        }
-
-        private void ProjectClosedEventReceived()
-        {
-            ControlVisibility = Visibility.Collapsed;
         }
     }
 }

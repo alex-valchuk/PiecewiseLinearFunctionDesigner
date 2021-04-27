@@ -28,7 +28,6 @@ namespace PiecewiseLinearFunctionDesigner
             containerRegistry.RegisterSingleton<IFileSystemService, FileSystemService>();
             containerRegistry.RegisterSingleton<IProjectService, ProjectService>();
             containerRegistry.RegisterSingleton<ITextLocalization, RussianTextLocalization>();
-            containerRegistry.RegisterSingleton<IApplicationCommands, ApplicationCommands>();
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

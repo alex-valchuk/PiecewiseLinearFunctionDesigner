@@ -61,7 +61,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
 
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
-            _eventAggregator.GetEvent<ProjectClosedEvent>().Subscribe(ProjectClosedEventReceived);
 
             AddFunctionCommand = new DelegateCommand(HandleAddFunctionCommand);
             SelectFunctionCommand = new DelegateCommand(HandleSelectFunctionCommand);
@@ -77,12 +76,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             }
             
             ControlVisibility = Visibility.Visible;
-        }
-    
-        private void ProjectClosedEventReceived()
-        {
-            Functions = null;
-            ControlVisibility = Visibility.Collapsed;
         }
 
         private void HandleAddFunctionCommand()
