@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
+using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using PiecewiseLinearFunctionDesigner.Localization;
@@ -19,6 +21,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private readonly IProjectService _projectService;
         private readonly IClipboardService _clipboardService;
         private readonly IPointsConverter _pointsConverter;
+        private readonly IMessageService _messageService;
         
         public ITextLocalization TextLocalization { get; }
 
@@ -67,13 +70,15 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
             ITextLocalization textLocalization,
             IProjectService projectService,
             IClipboardService clipboardService,
-            IPointsConverter pointsConverter)
+            IPointsConverter pointsConverter,
+            IMessageService messageService)
         {
             if (eventAggregator == null) throw new ArgumentNullException(nameof(eventAggregator));
             TextLocalization = textLocalization ?? throw new ArgumentNullException(nameof(textLocalization));
             _projectService = projectService ?? throw new ArgumentNullException(nameof(projectService));
             _clipboardService = clipboardService ?? throw new ArgumentNullException(nameof(clipboardService));
             _pointsConverter = pointsConverter ?? throw new ArgumentNullException(nameof(pointsConverter));
+            _messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
 
             eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
@@ -105,11 +110,10 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private void ExecuteAddPointCommand()
         {
             var lastPoint = ActiveFunction.Points.LastOrDefault();
-            ActiveFunction.AddPoint(new Point
-            {
-                X = lastPoint?.X ?? 0,
-                Y = lastPoint?.Y ?? 0
-            });
+            ActiveFunction.AddPoint(
+                new Point(
+                    lastPoint?.X ?? 0,
+                    lastPoint?.Y ?? 0));
             Points = new ObservableCollection<Point>(ActiveFunction.Points);
         }
 
@@ -132,9 +136,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 
         private void ExecuteGetFromClipboardCommand()
         {
-            var str = _clipboardService.GetText();
-            ActiveFunction.Points = _pointsConverter.ConvertToPoints(str);
-            Points = new ObservableCollection<Point>(ActiveFunction.Points);
+            try
+            {
+                var str = _clipboardService.GetText();
+                ActiveFunction.Points = _pointsConverter.ConvertToPoints(str);
+                Points = new ObservableCollection<Point>(ActiveFunction.Points);
+            }
+            catch (InvalidDataFormatException)
+            {
+                _messageService.ShowMessage(TextLocalization.ErrorMessage_ExpectedCsvFormat);
+            }
         }
     }
 }

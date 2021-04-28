@@ -5,7 +5,13 @@
     public class Point
     {
         public static event PropertyChangedEventHandler PropertyChanged;
-        
+
+        public Point(double x, double y)
+        {
+            _x = x;
+            _y = y;
+        }
+
         private double _x;
         public double X
         {
