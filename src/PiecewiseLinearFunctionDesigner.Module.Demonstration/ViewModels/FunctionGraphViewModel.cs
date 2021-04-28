@@ -66,7 +66,10 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         private void FunctionSpecifiedEventReceived(string functionName)
         {
             ActiveFunction = _projectService.ActiveProject.GetFunctionByName(functionName);
-            ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;
+            if (ActiveFunction != null)
+            {
+                ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;
+            }
             NotifyPointCollectionChanged();
         }
 

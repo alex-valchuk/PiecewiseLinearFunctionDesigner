@@ -102,7 +102,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
         private void FunctionSpecifiedEventReceived(string activeFunction)
         {
             ActiveFunction = _projectService.ActiveProject.GetFunctionByName(activeFunction);
-            Points = new ObservableCollection<Point>(ActiveFunction.Points);
+            Points = new ObservableCollection<Point>(ActiveFunction?.Points ?? new List<Point>());
             SelectedPoint = -1;
             ControlVisibility = Visibility.Visible;
         }

@@ -99,7 +99,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 
         private void HandleSelectFunctionCommand()
         {
-            _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
+            if (!string.IsNullOrWhiteSpace(SelectedFunction))
+                _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Publish(SelectedFunction);
         }
     }
 }
