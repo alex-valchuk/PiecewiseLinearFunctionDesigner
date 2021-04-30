@@ -7,14 +7,26 @@
     <GroupBox Header="{Binding TextLocalization.Graph}" Visibility="{Binding ControlVisibility}" Margin="25 0 0 0">
         <StackPanel>
             <Grid Width="450" Height="450">
-                <d3:Chart IsXAxisReversed="True" BottomTitle="{Binding TextLocalization.Temperature}" LeftTitle="{Binding TextLocalization.AbsoluteMark}">
-                    <d3:LineGraph 
-                        Description="{Binding ActiveFunction.Name}"
-                        Stroke="Blue"
-                        StrokeThickness="2"
-                        Width="450"
-                        Height="450"
-                        Points="{Binding PointCollection}"/>
+                <d3:Chart 
+                    IsXAxisReversed="True"
+                    BottomTitle="{Binding TextLocalization.Temperature}"
+                    LeftTitle="{Binding TextLocalization.AbsoluteMark}">
+                    <d3:Plot>
+                        <d3:LineGraph 
+                            Description="{Binding ActiveFunction.Name}"
+                            Points="{Binding PointCollection}"
+                            StrokeThickness="2"
+                            Stroke="Blue"
+                            Height="450"
+                            Width="450"
+                            />
+                        <d3:CircleMarkerGraph
+                            Sources="{Binding MarkerSources}"
+                            Color="Black"
+                            Max="20"
+                            Min="1"
+                        />
+                    </d3:Plot>
                 </d3:Chart>
             </Grid>
         </StackPanel>

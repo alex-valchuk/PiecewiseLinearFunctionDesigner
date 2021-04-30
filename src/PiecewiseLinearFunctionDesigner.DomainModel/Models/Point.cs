@@ -6,6 +6,10 @@
     {
         public static event PropertyChangedEventHandler PropertyChanged;
 
+        public Point()
+        {
+        }
+
         public Point(double x, double y)
         {
             _x = x;

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using InteractiveDataDisplay.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
@@ -36,6 +37,21 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         public PointCollection PointCollection =>
             new PointCollection(ActiveFunction?.Points?.Select(p => new Point(p.X, p.Y)) ?? new List<Point>());
 
+        public double[] Xs =>
+            ActiveFunction?.Points?.Select(p => p.X).ToArray() ?? new double[0];
+
+        public double[] Ys =>
+            ActiveFunction?.Points?.Select(p => p.Y).ToArray() ?? new double[0];
+
+        public DataCollection MarkerSources =>
+            new DataCollection
+            {
+                new DataSeries {Key = "X", Data = Xs},
+                new DataSeries {Key = "Y", Data = Ys},
+                new ColorSeries(),
+                new SizeSeries()
+            };
+
         public ITextLocalization TextLocalization { get; }
 
         public FunctionGraphViewModel(
@@ -61,6 +77,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
         private void NotifyPointCollectionChanged()
         {
             OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
+            OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkerSources)));
         }
 
         private void FunctionSpecifiedEventReceived(string functionName)

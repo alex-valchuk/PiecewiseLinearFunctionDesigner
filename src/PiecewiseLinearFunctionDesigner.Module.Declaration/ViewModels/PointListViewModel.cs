@@ -109,11 +109,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Declaration.ViewModels
 
         private void ExecuteAddPointCommand()
         {
-            var lastPoint = ActiveFunction.Points.LastOrDefault();
-            ActiveFunction.AddPoint(
-                new Point(
-                    lastPoint?.X ?? 0,
-                    lastPoint?.Y ?? 0));
+            ActiveFunction.AddPoint(new Point());
             Points = new ObservableCollection<Point>(ActiveFunction.Points);
         }
 
