@@ -7,12 +7,11 @@
     <GroupBox Header="{Binding TextLocalization.Graph}" Visibility="{Binding ControlVisibility}" Margin="25 0 0 0">
         <StackPanel>
             <Grid Width="450" Height="450">
-                <d3:Chart 
-                    IsXAxisReversed="True"
+                <d3:Chart
                     BottomTitle="{Binding TextLocalization.Temperature}"
                     LeftTitle="{Binding TextLocalization.AbsoluteMark}">
                     <d3:Plot>
-                        <d3:LineGraph 
+                        <d3:LineGraph
                             Description="{Binding ActiveFunction.Name}"
                             Points="{Binding PointCollection}"
                             StrokeThickness="2"
