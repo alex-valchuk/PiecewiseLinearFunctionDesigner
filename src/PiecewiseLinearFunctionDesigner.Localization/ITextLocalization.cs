@@ -17,5 +17,6 @@
         string AbsoluteMark { get; }
         string Graph { get; }
         string ErrorMessage_ExpectedCsvFormat { get; }
+        string ReverseFunction { get; }
     }
 }

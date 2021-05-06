@@ -17,5 +17,6 @@
         public string AbsoluteMark => "Абсолютная отметка";
         public string Graph => "График";
         public string ErrorMessage_ExpectedCsvFormat => "Неверный формат данных. Должен быть CSV.";
+        public string ReverseFunction => "Обратная функция";
     }
 }

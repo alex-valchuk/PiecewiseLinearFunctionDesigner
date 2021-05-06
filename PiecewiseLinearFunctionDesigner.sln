@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiecewiseLinearFunctionDesi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiecewiseLinearFunctionDesigner.DomainModel", "src\PiecewiseLinearFunctionDesigner.DomainModel\PiecewiseLinearFunctionDesigner.DomainModel.csproj", "{014364C3-280C-4F3D-B48E-D45BF4EA072C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PiecewiseLinearFunctionDesigner.DomainModel.Tests", "test\PiecewiseLinearFunctionDesigner.DomainModel.Tests\PiecewiseLinearFunctionDesigner.DomainModel.Tests.csproj", "{1AE89F67-A192-4214-97D5-D5162526303C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{014364C3-280C-4F3D-B48E-D45BF4EA072C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{014364C3-280C-4F3D-B48E-D45BF4EA072C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{014364C3-280C-4F3D-B48E-D45BF4EA072C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AE89F67-A192-4214-97D5-D5162526303C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AE89F67-A192-4214-97D5-D5162526303C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AE89F67-A192-4214-97D5-D5162526303C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AE89F67-A192-4214-97D5-D5162526303C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,6 +76,7 @@ Global
 		{B9681B42-9E9B-4E1B-ADD4-2D024AD62E31} = {E94421DC-39F0-4B0E-BAC3-7BFC50749831}
 		{EBE61D78-6EF8-4B87-A245-C28E61B73BB4} = {EA42B03D-477F-4823-B9E6-A58E8268AE3E}
 		{014364C3-280C-4F3D-B48E-D45BF4EA072C} = {EA42B03D-477F-4823-B9E6-A58E8268AE3E}
+		{1AE89F67-A192-4214-97D5-D5162526303C} = {CA8BCDEF-DC3F-4C1F-87DC-09F125373A69}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6409B83F-87B2-45AC-AE79-874A5CB60663}
