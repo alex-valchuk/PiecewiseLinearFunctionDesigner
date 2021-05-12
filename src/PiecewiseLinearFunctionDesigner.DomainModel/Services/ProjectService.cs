@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using PiecewiseLinearFunctionDesigner.Core.Exceptions;
+using PiecewiseLinearFunctionDesigner.DomainModel.Const;
 using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 
@@ -37,8 +38,8 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new EmptyStringArgumentException(nameof(filePath));
 
-            /*if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
-                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);*/
+            if (!Defaults.ProjectFileExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidFileTypeException($"Only '{Defaults.ProjectFileExtension}' files are supported");
             
             if (!File.Exists(filePath))
                 throw new InvalidOperationException("The path is invalid.");
@@ -75,8 +76,8 @@ namespace PiecewiseLinearFunctionDesigner.DomainModel.Services
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new EmptyStringArgumentException(nameof(filePath));
 
-            /*if (!ProjectExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
-                throw new InvalidFileTypeException($"Only files with '{ProjectExtension}' are supported", ProjectExtension);*/
+            if (!Defaults.ProjectFileExtension.Equals(Path.GetExtension(filePath), StringComparison.OrdinalIgnoreCase))
+                throw new InvalidFileTypeException($"Only '{Defaults.ProjectFileExtension}' files are supported");
 
             var projectContent = JsonConvert.SerializeObject(ActiveProject);
             return File.WriteAllTextAsync(filePath, projectContent);

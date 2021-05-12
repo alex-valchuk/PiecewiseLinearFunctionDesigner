@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using PiecewiseLinearFunctionDesigner.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
+using PiecewiseLinearFunctionDesigner.DomainModel.Const;
 using PiecewiseLinearFunctionDesigner.DomainModel.Exceptions;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using PiecewiseLinearFunctionDesigner.Localization;
@@ -104,7 +105,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
                 }
             }
             
-            if (_fileSystemService.OpenFile(out _filePath))
+            if (_fileSystemService.OpenFile(GetProjectExtensionDescription(), Defaults.ProjectFileExtension, out _filePath))
             {
                 try
                 {
@@ -128,26 +129,32 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
 
         private async Task SaveProjectAsync(bool showConfirmation = true)
         {
-            if (!string.IsNullOrWhiteSpace(_filePath) || 
-                _fileSystemService.OpenFile(out _filePath))
+            if (string.IsNullOrWhiteSpace(_filePath))
             {
-                try
-                {
-                    await _projectService.SaveActiveProjectAsync(_filePath);
+                if (!_fileSystemService.SaveFile(GetProjectExtensionDescription(), Defaults.ProjectFileExtension, out _filePath))
+                    return;
+            }
 
-                    if (showConfirmation)
-                    {
-                        _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
-                    }
-                    
-                    IsSaveEnabled = false;
-                }
-                catch (InvalidFileTypeException)
+            try
+            {
+                await _projectService.SaveActiveProjectAsync(_filePath);
+
+                if (showConfirmation)
                 {
-                    _messageService.ShowMessage(string.Format(_textLocalization.InvalidFileType));
+                    _messageService.ShowMessage(_textLocalization.ProjectSuccessfullySaved);
                 }
+                
+                IsSaveEnabled = false;
+            }
+            catch (InvalidFileTypeException)
+            {
+                _messageService.ShowMessage(string.Format(_textLocalization.InvalidFileType));
+                _filePath = null;
             }
         }
+
+        private static string GetProjectExtensionDescription()
+            => $"Piecewise linear function project files (*{Defaults.ProjectFileExtension})|*{Defaults.ProjectFileExtension}";
 
         private bool CanExecuteSaveCommand()
         {
