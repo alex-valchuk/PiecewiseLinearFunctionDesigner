@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:prism="http://prismlibrary.com/"
         prism:ViewModelLocator.AutoWireViewModel="True"
-        Title="{Binding TextLocalization.AppName}">
+        Title="{Binding TextLocalization.AppName}"
+        Closing="MainWindow_OnClosing">
     <StackPanel Margin="0">
         <ContentControl prism:RegionManager.RegionName="MenuRegion" DockPanel.Dock="Top" />
         <Grid>

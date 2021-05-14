@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
+using PiecewiseLinearFunctionDesigner.Abstract;
 
 namespace PiecewiseLinearFunctionDesigner.Views
 {
@@ -10,6 +12,14 @@ namespace PiecewiseLinearFunctionDesigner.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            if (DataContext is IClosing context)
+            {
+                e.Cancel = !context.OnClosing();
+            }
         }
     }
 }

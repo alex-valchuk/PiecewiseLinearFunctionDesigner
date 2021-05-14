@@ -71,6 +71,7 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             ExitCommand = new DelegateCommand(ExecuteExitCommand);
 
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Subscribe(AnyChangeMadeMessageReceived);
+            _eventAggregator.GetEvent<AppClosingEvent>().Subscribe(AppClosingEventReceived);
         }
 
         private async void ExecuteNewCommand()
@@ -161,16 +162,8 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
             return SaveVisibility == Visibility.Visible && IsSaveEnabled;
         }
 
-        private async void ExecuteExitCommand()
+        private void ExecuteExitCommand()
         {
-            if (IsSaveEnabled)
-            {
-                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges, _textLocalization.DoYouWannaSaveChangesBeforeExit))
-                {
-                    await SaveProjectAsync(false);
-                }
-            }
-            
             Application.Current.Shutdown();
         }
 
@@ -178,6 +171,18 @@ namespace PiecewiseLinearFunctionDesigner.Module.Menu.ViewModels
         {
             SaveVisibility = Visibility.Visible;
             IsSaveEnabled = true;
+        }
+
+        private async void AppClosingEventReceived()
+        {
+            if (IsSaveEnabled)
+            {
+                if (_messageService.ActionConfirmed(_textLocalization.UnsavedChanges,
+                    _textLocalization.DoYouWannaSaveChangesBeforeExit))
+                {
+                    await SaveProjectAsync(false);
+                }
+            }
         }
     }
 }
