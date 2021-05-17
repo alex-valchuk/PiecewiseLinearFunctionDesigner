@@ -11,36 +11,7 @@
                     BottomTitle="{Binding TextLocalization.Temperature}"
                     LeftTitle="{Binding TextLocalization.AbsoluteMark}">
                     <d3:Plot>
-                        <d3:LineGraph
-                            Description="{Binding ActiveFunction.Name}"
-                            Points="{Binding PointCollection}"
-                            StrokeThickness="2"
-                            Stroke="Blue"
-                            Height="450"
-                            Width="450"
-                        />
-                        <d3:CircleMarkerGraph
-                            Sources="{Binding MarkerSources}"
-                            Color="Black"
-                            Max="20"
-                            Min="1"
-                        />
-                        <d3:LineGraph
-                            Description="{Binding TextLocalization.ReverseFunction}"
-                            Points="{Binding ReversedPointCollection}"
-                            Visibility="{Binding ReversedGraphVisibility}"
-                            StrokeThickness="2"
-                            Stroke="Orange"
-                            Height="450"
-                            Width="450"
-                        />
-                        <d3:CircleMarkerGraph
-                            Sources="{Binding ReversedMarkerSources}"
-                            Visibility="{Binding ReversedGraphVisibility}"
-                            Color="Black"
-                            Max="20"
-                            Min="1"
-                        />
+                        <Grid Name="graphs"/>
                     </d3:Plot>
                 </d3:Chart>
             </Grid>

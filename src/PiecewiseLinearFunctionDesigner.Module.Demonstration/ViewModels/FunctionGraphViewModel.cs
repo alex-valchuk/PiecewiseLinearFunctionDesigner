@@ -1,21 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
-using InteractiveDataDisplay.Core;
 using PiecewiseLinearFunctionDesigner.Core.Events;
 using PiecewiseLinearFunctionDesigner.DomainModel.Models;
 using PiecewiseLinearFunctionDesigner.DomainModel.Services;
 using Prism.Events;
 using Prism.Mvvm;
 using PiecewiseLinearFunctionDesigner.Localization;
-using Point = System.Windows.Point;
+using PiecewiseLinearFunctionDesigner.Module.Demonstration.Abstract;
 
 namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
 {
-    public class FunctionGraphViewModel : BindableBase
+    public class FunctionGraphViewModel : BindableBase, IFunctionsContainer
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IProjectService _projectService;
@@ -27,12 +24,13 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             set => SetProperty(ref _controlVisibility, value);
         }
 
-        private Visibility _reversedGraphVisibility = Visibility.Collapsed;
-        public Visibility ReversedGraphVisibility
+        public List<Function> Functions
         {
-            get => _reversedGraphVisibility;
-            set => SetProperty(ref _reversedGraphVisibility, value);
+            get;
+            private set;
         }
+
+        public event EventHandler FunctionsDefined;
 
         private Function _activeFunction;
         public Function ActiveFunction
@@ -40,30 +38,6 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             get => _activeFunction;
             set => SetProperty(ref _activeFunction, value);
         }
-
-        public PointCollection PointCollection =>
-            new PointCollection(ActiveFunction?.Points?.Select(p => new Point(p.X, p.Y)) ?? new List<Point>());
-
-        public PointCollection ReversedPointCollection =>
-            new PointCollection(ActiveFunction?.Points?.Select(p => new Point(p.Y, p.X)) ?? new List<Point>());
-
-        public DataCollection MarkerSources =>
-            new DataCollection
-            {
-                new DataSeries {Key = "X", Data = ActiveFunction?.Xs ?? new double[0]},
-                new DataSeries {Key = "Y", Data = ActiveFunction?.Ys ?? new double[0]},
-                new ColorSeries(),
-                new SizeSeries()
-            };
-
-        public DataCollection ReversedMarkerSources =>
-            new DataCollection
-            {
-                new DataSeries {Key = "X", Data = ActiveFunction?.Ys ?? new double[0]},
-                new DataSeries {Key = "Y", Data = ActiveFunction?.Xs ?? new double[0]},
-                new ColorSeries(),
-                new SizeSeries()
-            };
 
         public ITextLocalization TextLocalization { get; }
 
@@ -78,31 +52,14 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             
             _eventAggregator.GetEvent<ProjectSpecifiedEvent>().Subscribe(ProjectSpecifiedEventReceived);
             _eventAggregator.GetEvent<FunctionSpecifiedEvent>().Subscribe(FunctionSpecifiedEventReceived);
-            _eventAggregator.GetEvent<ReversedFunctionVisibilityChangedEvent>().Subscribe(ReversedFunctionVisibilityChangedEventReceived);
         }
 
         private void ProjectSpecifiedEventReceived()
         {
             ActiveFunction = _projectService.ActiveProject.Functions.FirstOrDefault();
-            NotifyPointCollectionChanged();
-            NotifyReversedPointCollectionChanged();
+            Functions = _projectService.ActiveProject.Functions;
+            FunctionsDefined?.Invoke(this, EventArgs.Empty);
             ControlVisibility = Visibility.Visible;
-        }
-
-        private void NotifyPointCollectionChanged()
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(PointCollection)));
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(MarkerSources)));
-        }
-
-        private void NotifyReversedPointCollectionChanged(bool visible = false)
-        {
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(ReversedPointCollection)));
-            OnPropertyChanged(new PropertyChangedEventArgs(nameof(ReversedMarkerSources)));
-            
-            ReversedGraphVisibility = visible
-                ? Visibility.Visible
-                : Visibility.Collapsed;
         }
 
         private void FunctionSpecifiedEventReceived(string functionName)
@@ -112,20 +69,16 @@ namespace PiecewiseLinearFunctionDesigner.Module.Demonstration.ViewModels
             {
                 ActiveFunction.PropertyChanged += ActiveFunctionOnPropertyChanged;
             }
-            NotifyPointCollectionChanged();
-            NotifyReversedPointCollectionChanged();
+            if (Functions != null)
+            {
+                FunctionsDefined?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void ActiveFunctionOnPropertyChanged()
         {
             _eventAggregator.GetEvent<AnyChangeMadeEvent>().Publish();
-            NotifyPointCollectionChanged();
-            NotifyReversedPointCollectionChanged();
-        }
-
-        private void ReversedFunctionVisibilityChangedEventReceived(bool visible)
-        {
-            NotifyReversedPointCollectionChanged(visible);
+            FunctionsDefined?.Invoke(this, new EventArgs());
         }
     }
 }
